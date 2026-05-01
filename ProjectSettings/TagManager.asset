@@ -38,8 +38,17 @@ TagManager:
   - 
   - 
   m_SortingLayers:
+  - name: Ground
+    uniqueID: 216811143
+    locked: 0
+  - name: Walls
+    uniqueID: 900189491
+    locked: 0
   - name: Default
     uniqueID: 0
+    locked: 0
+  - name: Doors
+    uniqueID: 3599822431
     locked: 0
   m_RenderingLayers:
   - Default
