@@ -24,7 +24,20 @@ public class EnemyChaseDirectToPlayer : EnemyChaseSOBase
 
     public override void DoFrameUpdateLogic()
     {
-        base.DoFrameUpdateLogic();
+        if (enemy.IsWithinStrikingDistance)
+        {
+            enemy.MoveEnemy(Vector2.zero);
+            enemy.StateMachine.ChangeState(enemy.AttackState);
+            return;
+        }
+
+        if (!enemy.IsAggroed)
+        {
+            enemy.MoveEnemy(Vector2.zero);
+            enemy.InvestigationTargetPosition = playerTransform.position;
+            enemy.StateMachine.ChangeState(enemy.InvestigateState);
+            return;
+        }
 
         Vector2 moveDirection = (playerTransform.position - enemy.transform.position).normalized;
         enemy.MoveEnemy(moveDirection * _movementSpeed);
