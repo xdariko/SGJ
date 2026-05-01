@@ -1,0 +1,30 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 94dd4fd8fbbeccd40b3f345b703e7c3e, type: 3}
+  m_Name: MeleeAbility
+  m_EditorClassIdentifier: Assembly-CSharp::MeleeAbility
+  abilityName: New Ability
+  description: Ability description
+  icon: {fileID: 0}
+  cooldown: 1
+  activationSound: {fileID: 0}
+  isUnlocked: 0
+  visualEffectPrefab: {fileID: 0}
+  effectDuration: 1
+  attackRange: 1.5
+  attackDamage: 10
+  attackWidth: 0.5
+  enemyLayer:
+    serializedVersion: 2
+    m_Bits: 128
+  isEnhanced: 0
+  enhancedDamageMultiplier: 2

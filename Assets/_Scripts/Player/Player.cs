@@ -12,9 +12,20 @@ public class Player : MonoBehaviour
 
     private float currentHealth;
     private float currentStamina;
+    private bool isInvincible = false;
+    private bool isFacingRight = true;
 
     public float CurrentHealth => currentHealth;
     public float CurrentStamina => currentStamina;
+    public bool IsFacingRight => isFacingRight;
+    public bool IsInvincible => isInvincible;
+
+    public event System.Action<bool> OnEnhancedAttackAvailable;
+
+    public void InvokeOnEnhancedAttackAvailable(bool available)
+    {
+        OnEnhancedAttackAvailable?.Invoke(available);
+    }
 
     private void Awake()
     {
@@ -82,5 +93,42 @@ public class Player : MonoBehaviour
 
         staminaEvent.CallStaminaChanged(currentStamina, playerDetails.maxStamina, delta);
         return true;
+    }
+
+    public void SetInvincible(bool invincible)
+    {
+        isInvincible = invincible;
+        Debug.Log($"Player invincibility set to: {invincible}");
+    }
+
+    public void SetFacingRight(bool facingRight)
+    {
+        isFacingRight = facingRight;
+
+        // Flip sprite
+        Vector3 scale = transform.localScale;
+        scale.x = facingRight ? Mathf.Abs(scale.x) : -Mathf.Abs(scale.x);
+        transform.localScale = scale;
+    }
+
+    public void TakeDamage(float damage, GameObject attacker = null)
+    {
+        if (isInvincible)
+        {
+            Debug.Log("Player is invincible, damage blocked!");
+            return;
+        }
+
+        float newHealth = Mathf.Max(0, currentHealth - damage);
+        float delta = damage;
+        currentHealth = newHealth;
+
+        healthEvent.CallHealthChanged(currentHealth, playerDetails.maxHealth, delta);
+
+        if (newHealth <= 0)
+        {
+            // Player died - would need to implement death logic
+            Debug.Log("Player died!");
+        }
     }
 }

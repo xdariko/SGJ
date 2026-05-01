@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 316be91229a9e2a4bb396be473fe352b, type: 3}
+  m_Name: AreaAttackAbility
+  m_EditorClassIdentifier: Assembly-CSharp::AreaAttackAbility
+  abilityName: New Ability
+  description: Ability description
+  icon: {fileID: 0}
+  cooldown: 1
+  activationSound: {fileID: 0}
+  isUnlocked: 0
+  visualEffectPrefab: {fileID: 0}
+  effectDuration: 1
+  attackRadius: 3
+  attackDamage: 15
+  enemyLayer:
+    serializedVersion: 2
+    m_Bits: 0
+  areaIndicatorPrefab: {fileID: 0}
+  indicatorDuration: 0.5

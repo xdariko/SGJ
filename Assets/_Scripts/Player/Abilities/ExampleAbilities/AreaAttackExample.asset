@@ -1,0 +1,21 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f5f67c52d1564df4a532e5e26e7fc588, type: 3}
+  m_Name: AreaAttackExample
+  m_EditorClassIdentifier:
+  abilityName: Area Attack
+  description: Unleash a powerful attack around you
+  cooldown: 8
+  attackRadius: 3.5
+  attackDamage: 20
+  enemyLayer: 10
+  isUnlocked: false

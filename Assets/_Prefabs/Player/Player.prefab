@@ -13,8 +13,11 @@ GameObject:
   - component: {fileID: 4333293228849883691}
   - component: {fileID: 5377140516653062308}
   - component: {fileID: 3019620646306389343}
+  - component: {fileID: -8729639762574680117}
+  - component: {fileID: -4561844795223832708}
   - component: {fileID: 1886755253695926385}
   - component: {fileID: 3824397034592166607}
+  - component: {fileID: 9142164308260497350}
   m_Layer: 3
   m_Name: Player
   m_TagString: Player
@@ -52,8 +55,8 @@ Rigidbody2D:
   m_UseAutoMass: 0
   m_Mass: 1
   m_LinearDamping: 0
-  m_AngularDamping: 0.05
-  m_GravityScale: 1
+  m_AngularDamping: 0
+  m_GravityScale: 0
   m_Material: {fileID: 0}
   m_IncludeLayers:
     serializedVersion: 2
@@ -130,6 +133,45 @@ MonoBehaviour:
   playerDetails: {fileID: 11400000, guid: 325dbbb793ad87540a14d18d626aaa54, type: 2}
   healthEvent: {fileID: 0}
   staminaEvent: {fileID: 0}
+--- !u!114 &-8729639762574680117
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2153398447405136414}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fcafbabab15e90b41b03480a7b8c44b0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerExampleSetup
+  meleeAbility: {fileID: 11400000, guid: b1b50d9a93ebd834d9604fa1090ad274, type: 2}
+  rangedAbility: {fileID: 11400000, guid: b37b1c3eb55bb2442b91b27928c3b313, type: 2}
+  hookAbility: {fileID: 11400000, guid: 8d295801d58b3fd4f8c2cfcbe522b154, type: 2}
+  areaAttackAbility: {fileID: 11400000, guid: baac943e52d290047abab64e8d012e5e, type: 2}
+  dashAbility: {fileID: 11400000, guid: 9d0a38c86453dec439c5453a178f8622, type: 2}
+  autoSetupPlayer: 1
+--- !u!114 &-4561844795223832708
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2153398447405136414}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f7eba456ff7810e41a8ded87bb0e5db5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerCombat
+  meleeAbility: {fileID: 0}
+  rangedAbility: {fileID: 0}
+  hookAbility: {fileID: 0}
+  areaAttackAbility: {fileID: 0}
+  dashAbility: {fileID: 0}
+  primaryAttackKey: 323
+  secondaryAttackKey: 324
+  tertiaryAttackKey: 32
+  dashKey: 304
 --- !u!114 &1886755253695926385
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -154,6 +196,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5a4fc1cabbeefc54f9af0e46401bc231, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::StaminaEvent
+--- !u!114 &9142164308260497350
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2153398447405136414}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cb7ae1fa664e9884cb9b6cf8c926d543, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::AbilityManager
+  abilities: []
+  playerCombat: {fileID: 0}
 --- !u!1 &4931124534402394375
 GameObject:
   m_ObjectHideFlags: 0

@@ -1,0 +1,28 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 19e49ba5237bf52498c9470fe9b53ded, type: 3}
+  m_Name: HookAbility
+  m_EditorClassIdentifier: Assembly-CSharp::HookAbility
+  abilityName: New Ability
+  description: Ability description
+  icon: {fileID: 0}
+  cooldown: 1
+  activationSound: {fileID: 0}
+  isUnlocked: 0
+  visualEffectPrefab: {fileID: 0}
+  effectDuration: 1
+  hookPrefab: {fileID: 586980369796077242, guid: e3d23abd6b1efe54497905abb28474f4, type: 3}
+  hookSpeed: 15
+  maxHookDistance: 10
+  hookDuration: 3
+  pullSpeed: 20
+  enhancedAttackWindow: 2

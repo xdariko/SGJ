@@ -18,13 +18,16 @@ public class PlayerController : MonoBehaviour
     private float dashCooldownTimer;
 
     public event System.Action<Vector2> OnMove;
+    public Vector2 LastMoveDirection => lastNonZeroDirection;
 
     private Player player;
 
     private void Awake()
     {
+        Debug.Log("PlayerController.Awake() called");
         if (Instance != null && Instance != this)
         {
+            Debug.LogWarning("PlayerController: Duplicate instance detected, destroying this one");
             Destroy(gameObject);
             return;
         }
@@ -33,6 +36,8 @@ public class PlayerController : MonoBehaviour
 
         rb = GetComponent<Rigidbody2D>();
         player = GetComponent<Player>();
+
+        Debug.Log($"PlayerController initialized. Rigidbody: {rb != null}, Player: {player != null}");
     }
 
     private void Update()
@@ -51,7 +56,10 @@ public class PlayerController : MonoBehaviour
     private void ProcessInputs()
     {
         if (Keyboard.current == null)
+        {
+            Debug.LogWarning("PlayerController: Keyboard.current is null!");
             return;
+        }
 
         float moveX = 0f;
         float moveY = 0f;
@@ -104,7 +112,16 @@ public class PlayerController : MonoBehaviour
         float currentSpeed = playerDetails.MoveSpeed *
             (isSprinting ? playerDetails.SprintMultiplier : 1f);
 
-        rb.linearVelocity = moveDirection * currentSpeed;
+        // Only move if there's input, otherwise stop
+        if (moveDirection.magnitude > 0.1f)
+        {
+            rb.linearVelocity = moveDirection * currentSpeed;
+            lastNonZeroDirection = moveDirection;
+        }
+        else
+        {
+            rb.linearVelocity = Vector2.zero;
+        }
 
         OnMove?.Invoke(moveDirection != Vector2.zero ? moveDirection : lastNonZeroDirection);
     }
