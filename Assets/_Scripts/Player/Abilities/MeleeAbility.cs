@@ -18,10 +18,10 @@ public class MeleeAbility : BaseAbility
         PlayActivationSound(player.transform.position);
         InstantiateVisualEffect(player.transform.position, player.transform.rotation);
 
-        // Calculate attack direction based on player's movement direction
+        // Get attack direction from player controller (mouse direction)
         PlayerController playerController = player.GetComponent<PlayerController>();
         Vector2 attackDirection = playerController != null ?
-            playerController.LastMoveDirection.normalized :
+            playerController.GetMouseDirection() :
             (player.IsFacingRight ? Vector2.right : Vector2.left);
 
         // Perform melee attack
@@ -33,34 +33,33 @@ public class MeleeAbility : BaseAbility
 
     private void PerformMeleeAttack(Vector2 origin, Vector2 direction)
     {
-        // Create attack box
-        Vector2 attackSize = new Vector2(attackRange, attackWidth);
-
-        // Calculate rotation based on direction
+        // Create a semi-circle (pie slice) attack area in front of the player
         float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
+        float halfAngle = 90f; // 180 degree arc (semi-circle)
 
-        // Detect enemies in attack range
-        RaycastHit2D[] hits = Physics2D.BoxCastAll(
-            origin + direction * (attackRange / 2),
-            attackSize,
-            angle,
-            Vector2.zero,
-            0f,
-            enemyLayer
-        );
+        // Detect enemies in the semi-circle area
+        Collider2D[] hitEnemies = Physics2D.OverlapCircleAll(origin, attackRange, enemyLayer);
 
-        foreach (var hit in hits)
+        foreach (var enemyCollider in hitEnemies)
         {
-            if (hit.collider.TryGetComponent<Enemy>(out var enemy))
+            if (enemyCollider.TryGetComponent<Enemy>(out var enemy))
             {
-                float finalDamage = attackDamage;
-                if (isEnhanced)
-                {
-                    finalDamage *= enhancedDamageMultiplier;
-                }
+                // Check if enemy is within the attack arc
+                Vector2 toEnemy = ((Vector2)enemyCollider.transform.position - origin).normalized;
+                float angleToEnemy = Mathf.Atan2(toEnemy.y, toEnemy.x) * Mathf.Rad2Deg;
+                float angleDiff = Mathf.DeltaAngle(angle, angleToEnemy);
 
-                // In a real implementation, this would call enemy.TakeDamage(finalDamage)
-                Debug.Log($"Hit {enemy.name} with {(isEnhanced ? "enhanced " : "")}melee attack for {finalDamage} damage!");
+                if (Mathf.Abs(angleDiff) <= halfAngle)
+                {
+                    float finalDamage = attackDamage;
+                    if (isEnhanced)
+                    {
+                        finalDamage *= enhancedDamageMultiplier;
+                    }
+
+                    // In a real implementation, this would call enemy.TakeDamage(finalDamage)
+                    Debug.Log($"Hit {enemy.name} with {(isEnhanced ? "enhanced " : "")}melee attack for {finalDamage} damage! (Angle diff: {angleDiff}°)");
+                }
             }
         }
     }

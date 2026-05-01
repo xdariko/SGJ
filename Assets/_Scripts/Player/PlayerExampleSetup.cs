@@ -7,7 +7,6 @@ public class PlayerExampleSetup : MonoBehaviour
     public RangedAbility rangedAbility;
     public HookAbility hookAbility;
     public AreaAttackAbility areaAttackAbility;
-    public DashAbility dashAbility;
 
     [Header("Auto Setup")]
     public bool autoSetupPlayer = true;
@@ -55,7 +54,6 @@ public class PlayerExampleSetup : MonoBehaviour
             combat.SetRangedAbility(rangedAbility);
             combat.SetHookAbility(hookAbility);
             combat.SetAreaAttackAbility(areaAttackAbility);
-            combat.SetDashAbility(dashAbility);
         }
 
         // Setup ability manager
@@ -92,13 +90,6 @@ public class PlayerExampleSetup : MonoBehaviour
                 areaAttackAbility.Initialize();
                 areaAttackAbility.Unlock();
                 combat.UnlockAreaAttackAbility();
-            }
-
-            if (dashAbility != null)
-            {
-                abilityManager.AddAbility("Dash", dashAbility);
-                dashAbility.Initialize();
-                dashAbility.Unlock();
             }
 
             Debug.Log("PlayerExampleSetup: All abilities initialized and unlocked!");

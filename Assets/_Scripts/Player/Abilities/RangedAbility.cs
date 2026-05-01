@@ -16,8 +16,11 @@ public class RangedAbility : BaseAbility
 
         PlayActivationSound(player.transform.position);
 
-        // Calculate shoot direction based on player's facing direction
-        Vector2 shootDirection = player.IsFacingRight ? Vector2.right : Vector2.left;
+        // Get shoot direction from mouse position
+        PlayerController playerController = player.GetComponent<PlayerController>();
+        Vector2 shootDirection = playerController != null ?
+            playerController.GetMouseDirection() :
+            (player.IsFacingRight ? Vector2.right : Vector2.left);
 
         // Instantiate projectile
         GameObject projectile = Instantiate(projectilePrefab, player.transform.position, Quaternion.identity);
@@ -46,7 +49,7 @@ public class RangedAbility : BaseAbility
         }
 
         InstantiateVisualEffect(player.transform.position, Quaternion.LookRotation(shootDirection));
-        Debug.Log("Fired ranged projectile!");
+        Debug.Log($"Fired ranged projectile in direction {shootDirection}!");
         InvokeOnAbilityUsed();
     }
 }

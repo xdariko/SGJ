@@ -189,6 +189,22 @@ public class PlayerController : MonoBehaviour
         rb.linearVelocity = Vector2.zero;
     }
 
+    public Vector2 GetMouseDirection()
+    {
+        if (Mouse.current == null)
+        {
+            Debug.LogWarning("PlayerController: Mouse.current is null!");
+            return Vector2.right;
+        }
+
+        Vector2 mousePosition = Mouse.current.position.ReadValue();
+        Vector3 worldMousePos = Camera.main.ScreenToWorldPoint(mousePosition);
+        Vector2 direction = ((Vector2)worldMousePos - (Vector2)transform.position).normalized;
+        
+        Debug.Log($"Mouse direction: {direction}");
+        return direction;
+    }
+
     private void OnDestroy()
     {
         if (Instance == this)

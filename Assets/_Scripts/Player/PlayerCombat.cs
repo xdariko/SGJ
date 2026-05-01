@@ -8,13 +8,9 @@ public class PlayerCombat : MonoBehaviour
     [SerializeField] private BaseAbility rangedAbility;
     [SerializeField] private BaseAbility hookAbility;
     [SerializeField] private BaseAbility areaAttackAbility;
-    [SerializeField] private BaseAbility dashAbility;
 
     [Header("Input Settings")]
-    [SerializeField] private KeyCode primaryAttackKey = KeyCode.Mouse0;
-    [SerializeField] private KeyCode secondaryAttackKey = KeyCode.Mouse1;
-    [SerializeField] private KeyCode tertiaryAttackKey = KeyCode.Space;
-    [SerializeField] private KeyCode dashKey = KeyCode.LeftShift;
+    [SerializeField] private Key switchAbilityKey = Key.E;
 
     private Player player;
     private PlayerController playerController;
@@ -29,7 +25,6 @@ public class PlayerCombat : MonoBehaviour
     public void SetRangedAbility(BaseAbility ability) { rangedAbility = ability; }
     public void SetHookAbility(BaseAbility ability) { hookAbility = ability; }
     public void SetAreaAttackAbility(BaseAbility ability) { areaAttackAbility = ability; }
-    public void SetDashAbility(BaseAbility ability) { dashAbility = ability; }
 
     private void Awake()
     {
@@ -83,7 +78,6 @@ public class PlayerCombat : MonoBehaviour
         if (rangedAbility != null) rangedAbility.Initialize();
         if (hookAbility != null) hookAbility.Initialize();
         if (areaAttackAbility != null) areaAttackAbility.Initialize();
-        if (dashAbility != null) dashAbility.Initialize();
     }
 
     private void SetDefaultPrimaryAbility()
@@ -94,7 +88,6 @@ public class PlayerCombat : MonoBehaviour
             else if (rangedAbility != null) currentPrimaryAbility = rangedAbility;
             else if (hookAbility != null) currentPrimaryAbility = hookAbility;
             else if (areaAttackAbility != null) currentPrimaryAbility = areaAttackAbility;
-            else if (dashAbility != null) currentPrimaryAbility = dashAbility;
 
             Debug.Log($"Current primary ability set to: {currentPrimaryAbility?.name ?? "null"}");
         }
@@ -132,11 +125,11 @@ public class PlayerCombat : MonoBehaviour
             TryUseTertiaryAbility();
         }
 
-        // Dash (Shift)
-        if (Keyboard.current != null && Keyboard.current.leftShiftKey.wasPressedThisFrame)
+        // Switch ability (E key)
+        if (Keyboard.current != null && Keyboard.current[switchAbilityKey].wasPressedThisFrame)
         {
-            Debug.Log("LEFT SHIFT PRESSED - Trying dash ability");
-            TryUseDashAbility();
+            Debug.Log("SWITCH ABILITY KEY PRESSED - Switching primary ability");
+            SwitchPrimaryAbility();
         }
     }
 
@@ -146,7 +139,6 @@ public class PlayerCombat : MonoBehaviour
         rangedAbility?.UpdateCooldown(Time.deltaTime);
         hookAbility?.UpdateCooldown(Time.deltaTime);
         areaAttackAbility?.UpdateCooldown(Time.deltaTime);
-        dashAbility?.UpdateCooldown(Time.deltaTime);
     }
 
     private void TryUsePrimaryAbility()
@@ -183,9 +175,40 @@ public class PlayerCombat : MonoBehaviour
         areaAttackAbility?.TryUseAbility(player);
     }
 
-    private void TryUseDashAbility()
+    private void SwitchPrimaryAbility()
     {
-        dashAbility?.TryUseAbility(player);
+        // Only switch between melee and ranged if both are unlocked
+        if (meleeAbility == null || rangedAbility == null)
+        {
+            Debug.LogWarning("Cannot switch: melee or ranged ability not assigned!");
+            return;
+        }
+
+        if (!meleeAbility.IsUnlocked || !rangedAbility.IsUnlocked)
+        {
+            Debug.LogWarning("Cannot switch: one or both abilities not unlocked!");
+            return;
+        }
+
+        // Toggle between melee and ranged
+        if (currentPrimaryAbility == meleeAbility)
+        {
+            currentPrimaryAbility = rangedAbility;
+            Debug.Log("Switched to ranged ability");
+        }
+        else if (currentPrimaryAbility == rangedAbility)
+        {
+            currentPrimaryAbility = meleeAbility;
+            Debug.Log("Switched to melee ability");
+        }
+        else
+        {
+            // Default to melee if current is something else
+            currentPrimaryAbility = meleeAbility;
+            Debug.Log("Switched to melee ability (default)");
+        }
+
+        Debug.Log($"Current primary ability is now: {currentPrimaryAbility.name}");
     }
 
     public void UnlockRangedAbility()
@@ -193,8 +216,7 @@ public class PlayerCombat : MonoBehaviour
         if (rangedAbility != null)
         {
             rangedAbility.Unlock();
-            currentPrimaryAbility = rangedAbility; // Replace melee with ranged
-            Debug.Log("Ranged ability unlocked! Primary attack is now ranged.");
+            Debug.Log("Ranged ability unlocked!");
         }
     }
 

@@ -8,7 +8,6 @@ public class HookAbility : BaseAbility
     [SerializeField] private float hookSpeed = 15f;
     [SerializeField] private float maxHookDistance = 10f;
     [SerializeField] private float hookDuration = 3f;
-    [SerializeField] private float pullSpeed = 20f;
     [SerializeField] private float enhancedAttackWindow = 2f;
 
     private HookProjectile activeHook;
@@ -30,8 +29,11 @@ public class HookAbility : BaseAbility
 
         PlayActivationSound(player.transform.position);
 
-        // Calculate hook direction based on player's facing direction
-        Vector2 hookDirection = player.IsFacingRight ? Vector2.right : Vector2.left;
+        // Get hook direction from mouse position
+        PlayerController playerController = player.GetComponent<PlayerController>();
+        Vector2 hookDirection = playerController != null ?
+            playerController.GetMouseDirection() :
+            (player.IsFacingRight ? Vector2.right : Vector2.left);
 
         // Instantiate hook
         GameObject hookObject = Instantiate(hookPrefab, player.transform.position, Quaternion.identity);
@@ -60,90 +62,21 @@ public class HookAbility : BaseAbility
     {
         if (hook != activeHook) return;
 
-        // Start pulling player towards enemy
-        // Note: In a real implementation, this would need to be started on a MonoBehaviour
-        // For now, we'll use a simplified approach
-        PullPlayerToTargetImmediate(hook.transform.position, enemy);
-    }
-
-    private void PullPlayerToTargetImmediate(Vector3 targetPosition, GameObject enemy)
-    {
+        // Get player
         Player player = activeHook.Owner.GetComponent<Player>();
         if (player == null) return;
 
-        // Disable player movement during pull
-        PlayerMovement movement = player.GetComponent<PlayerMovement>();
-        if (movement != null)
-        {
-            movement.SetMovementEnabled(false);
-        }
-
-        // Move player directly to target (simplified for ScriptableObject)
-        player.transform.position = targetPosition;
+        // Teleport player to hook position (near enemy)
+        player.transform.position = hook.transform.position;
 
         // Face player towards enemy
-        if (targetPosition.x > player.transform.position.x)
+        if (hook.transform.position.x > player.transform.position.x)
         {
             player.SetFacingRight(true);
         }
         else
         {
             player.SetFacingRight(false);
-        }
-
-        // Re-enable movement
-        if (movement != null)
-        {
-            movement.SetMovementEnabled(true);
-        }
-
-        // Activate enhanced attack window
-        enhancedWindowEndTime = Time.time + enhancedAttackWindow;
-
-        // Notify player about enhanced attack availability
-        player.InvokeOnEnhancedAttackAvailable(true);
-
-        Debug.Log("Player pulled to target! Enhanced attack available for " + enhancedAttackWindow + " seconds");
-    }
-
-    private System.Collections.IEnumerator PullPlayerToTarget(Vector3 targetPosition, GameObject enemy)
-    {
-        Player player = activeHook.Owner.GetComponent<Player>();
-        if (player == null) yield break;
-
-        float startTime = Time.time;
-        Vector3 startPosition = player.transform.position;
-
-        // Disable player movement during pull
-        PlayerMovement movement = player.GetComponent<PlayerMovement>();
-        if (movement != null)
-        {
-            movement.SetMovementEnabled(false);
-        }
-
-        while (Time.time - startTime < hookDuration && Vector3.Distance(player.transform.position, targetPosition) > 0.1f)
-        {
-            // Move player towards target
-            Vector3 direction = (targetPosition - player.transform.position).normalized;
-            player.transform.position += direction * pullSpeed * Time.deltaTime;
-
-            // Face player towards enemy
-            if (targetPosition.x > player.transform.position.x)
-            {
-                player.SetFacingRight(true);
-            }
-            else
-            {
-                player.SetFacingRight(false);
-            }
-
-            yield return null;
-        }
-
-        // Re-enable movement
-        if (movement != null)
-        {
-            movement.SetMovementEnabled(true);
         }
 
         // Activate enhanced attack window
@@ -181,7 +114,7 @@ public class HookAbility : BaseAbility
             Player player = activeHook != null ? activeHook.Owner.GetComponent<Player>() : null;
             if (player != null)
             {
-            player.InvokeOnEnhancedAttackAvailable(false);
+                player.InvokeOnEnhancedAttackAvailable(false);
             }
         }
     }

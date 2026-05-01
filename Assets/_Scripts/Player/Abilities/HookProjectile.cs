@@ -33,8 +33,11 @@ public class HookProjectile : MonoBehaviour
 
         rb.linearVelocity = direction * speed;
         rb.gravityScale = 0f;
-        rb.freezeRotation = true;
-        rb.isKinematic = true;
+        rb.freezeRotation = false; // Allow rotation
+
+        // Rotate sprite to face direction of movement (front faces direction)
+        float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
+        rb.rotation = angle; // Use Rigidbody2D rotation for proper physics
 
         Destroy(gameObject, duration);
     }
@@ -45,6 +48,25 @@ public class HookProjectile : MonoBehaviour
         if (!isReturning && Vector3.Distance(startPosition, transform.position) >= maxDistance)
         {
             StartReturning();
+        }
+
+        // If returning, continuously update direction towards owner
+        if (isReturning && owner != null)
+        {
+            Vector2 returnDirection = ((Vector2)owner.transform.position - (Vector2)transform.position).normalized;
+            rb.linearVelocity = returnDirection * (speed * 1.5f);
+
+            // Update rotation: hook should return with BACK facing player
+            // So we add 180 degrees to the direction angle
+            float angle = Mathf.Atan2(returnDirection.y, returnDirection.x) * Mathf.Rad2Deg + 180f;
+            rb.rotation = angle;
+
+            // Check if reached owner
+            float distanceToOwner = Vector3.Distance(transform.position, owner.transform.position);
+            if (distanceToOwner <= 0.5f) // Close enough to owner
+            {
+                DestroyProjectile();
+            }
         }
     }
 
@@ -72,12 +94,12 @@ public class HookProjectile : MonoBehaviour
         if (isReturning) return;
 
         isReturning = true;
-        rb.linearVelocity = -direction * (speed * 1.5f); // Return faster
+        Debug.Log("Hook returning to player");
+    }
 
-        // Change visual to indicate returning
-        // hookRenderer.color = returnColor;
-
-        Destroy(gameObject, 2f); // Destroy after short time when returning
+    private void DestroyProjectile()
+    {
+        Destroy(gameObject);
     }
 
     public void Cancel()

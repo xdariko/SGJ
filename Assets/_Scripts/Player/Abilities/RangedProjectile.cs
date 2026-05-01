@@ -29,6 +29,10 @@ public class RangedProjectile : MonoBehaviour
         rb.gravityScale = 0f;
         rb.freezeRotation = true;
 
+        // Rotate sprite to face direction of movement
+        float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
+        transform.rotation = Quaternion.AngleAxis(angle, Vector3.forward);
+
         Destroy(gameObject, lifetime);
     }
 
@@ -65,14 +69,5 @@ public class RangedProjectile : MonoBehaviour
         // Add impact effect if available
         // Instantiate(impactEffect, transform.position, transform.rotation);
         Destroy(gameObject);
-    }
-
-    public void SetDirection(Vector2 newDirection)
-    {
-        direction = newDirection.normalized;
-        if (rb != null)
-        {
-            rb.linearVelocity = direction * speed;
-        }
     }
 }
