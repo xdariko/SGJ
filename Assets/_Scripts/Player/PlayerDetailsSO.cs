@@ -18,6 +18,7 @@ public class PlayerDetailsSO : ScriptableObject
 
     [Header("Health Settings")]
     public float maxHealth = 100;
+    public float healthRegenRate = 5f;
 
     [Header("Stamina Settings")]
     public float maxStamina = 100;
