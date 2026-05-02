@@ -38,7 +38,7 @@ public class AreaAttackAbility : BaseAbility
 
         foreach (var enemyCollider in hitEnemies)
         {
-            IDamageable damageable = enemyCollider.GetComponentInParent<IDamageable>();
+            IDamageable damageable = enemyCollider.GetComponent<IDamageable>();
 
             if (damageable != null)
             {
