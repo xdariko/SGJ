@@ -52,7 +52,7 @@ public class MeleeAbility : BaseAbility
             if (isEnhanced)
                 finalDamage *= enhancedDamageMultiplier;
 
-            IDamageable damageable = enemyCollider.GetComponentInParent<IDamageable>();
+             IDamageable damageable = enemyCollider.GetComponent<IDamageable>();
 
             if (damageable != null)
             {

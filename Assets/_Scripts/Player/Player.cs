@@ -41,6 +41,12 @@ public class Player : MonoBehaviour
 
         currentHealth = playerDetails.maxHealth;
         currentStamina = playerDetails.maxStamina;
+
+        // Ensure lower body collider exists for environment collisions
+        if (GetComponent<PlayerColliderSetup>() == null)
+        {
+            gameObject.AddComponent<PlayerColliderSetup>();
+        }
     }
 
     public void TakeDamage(float damage)

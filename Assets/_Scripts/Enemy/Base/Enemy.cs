@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AI;
 
 public class Enemy : MonoBehaviour, IEnemyMoveable, ITriggerCheckable
 {
@@ -27,6 +28,16 @@ public class Enemy : MonoBehaviour, IEnemyMoveable, ITriggerCheckable
         ChaseState = new EnemyChaseState(this, StateMachine);
         AttackState = new EnemyAttackState(this, StateMachine);
         InvestigateState = new EnemyInvestigateState(this, StateMachine);
+        // Ensure enemy has a body collider for hit detection
+        if (GetComponent<Collider2D>() == null)
+        {
+            CircleCollider2D col = gameObject.AddComponent<CircleCollider2D>();
+            NavMeshAgent agent = GetComponent<NavMeshAgent>();
+            if (agent != null)
+                col.radius = agent.radius;
+            else
+                col.radius = 0.5f;
+        }
     }
 
     private void Start()

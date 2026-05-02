@@ -57,7 +57,7 @@ public class RangedProjectile : MonoBehaviour
         if (other.CompareTag("Player") || other.CompareTag("PlayerProjectile"))
             return;
 
-        IDamageable damageable = other.GetComponentInParent<IDamageable>();
+        IDamageable damageable = other.GetComponent<IDamageable>();
 
         if (damageable != null)
         {
