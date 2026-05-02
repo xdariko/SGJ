@@ -4,6 +4,8 @@ using UnityEngine;
 public class EnemyAnimator : MonoBehaviour
 {
     private static readonly int StateHash = Animator.StringToHash("State");
+    private static readonly int AttackStateHash = Animator.StringToHash("Attack");
+    private static readonly int DeathStateHash = Animator.StringToHash("Death");
 
     [SerializeField] private Animator animator;
 
@@ -43,12 +45,13 @@ public class EnemyAnimator : MonoBehaviour
         _currentState = EnemyAnimState.Attack;
         animator.SetInteger(StateHash, (int)EnemyAnimState.Attack);
 
-        if (restartFromBeginning)
-        {
-            // Force is important for repeated attacks: it restarts the Attack clip every cycle.
-            animator.Play("Attack", 0, 0f);
-            animator.Update(0f);
-        }
+        if (!restartFromBeginning)
+            return;
+
+        if (animator.HasState(0, AttackStateHash))
+            animator.Play(AttackStateHash, 0, 0f);
+
+        animator.Update(0f);
     }
 
     public IEnumerator PlayAttackAndWait(float fallbackDuration)
@@ -59,8 +62,49 @@ public class EnemyAnimator : MonoBehaviour
 
     public IEnumerator WaitForAttackAnimation(float fallbackDuration)
     {
-        float duration = GetAttackClipDuration(fallbackDuration);
-        yield return new WaitForSeconds(duration);
+        if (animator == null)
+        {
+            yield return new WaitForSeconds(Mathf.Max(0.01f, fallbackDuration));
+            yield break;
+        }
+
+        float fallback = Mathf.Max(0.01f, GetAttackClipDuration(fallbackDuration));
+        float enterTimeout = Mathf.Min(0.25f, fallback);
+        float enterTimer = 0f;
+
+        // Give Animator a chance to actually enter Attack after State parameter / Play().
+        while (!IsCurrentState(AttackStateHash) && enterTimer < enterTimeout)
+        {
+            enterTimer += Time.deltaTime;
+            yield return null;
+        }
+
+        if (!IsCurrentState(AttackStateHash))
+        {
+            // Fallback for controllers where the state is not literally named "Attack".
+            yield return new WaitForSeconds(fallback);
+            yield break;
+        }
+
+        // Wait until the visible Attack state has completed one full play-through.
+        while (IsCurrentState(AttackStateHash))
+        {
+            AnimatorStateInfo info = animator.GetCurrentAnimatorStateInfo(0);
+
+            if (!animator.IsInTransition(0) && info.normalizedTime >= 1f)
+                break;
+
+            yield return null;
+        }
+    }
+
+    private bool IsCurrentState(int stateHash)
+    {
+        if (animator == null)
+            return false;
+
+        AnimatorStateInfo info = animator.GetCurrentAnimatorStateInfo(0);
+        return info.shortNameHash == stateHash;
     }
 
     private float GetAttackClipDuration(float fallbackDuration)
@@ -81,12 +125,53 @@ public class EnemyAnimator : MonoBehaviour
                 bestLength = Mathf.Max(bestLength, clip.length);
         }
 
-        // If Unity does not expose the override clip here, fall back to serialized timing.
         return Mathf.Max(0.01f, bestLength > 0f ? bestLength : fallbackDuration);
     }
 
     public void PlayDeath()
     {
-        PlayState(EnemyAnimState.Death);
+        if (animator == null)
+            return;
+
+        _currentState = EnemyAnimState.Death;
+        animator.SetInteger(StateHash, (int)EnemyAnimState.Death);
+
+        if (animator.HasState(0, DeathStateHash))
+            animator.Play(DeathStateHash, 0, 0f);
+
+        animator.Update(0f);
+    }
+
+    public IEnumerator PlayDeathAndWait(float fallbackDuration)
+    {
+        PlayDeath();
+        yield return WaitForDeathAnimation(fallbackDuration);
+    }
+
+    public IEnumerator WaitForDeathAnimation(float fallbackDuration)
+    {
+        float duration = GetDeathClipDuration(fallbackDuration);
+        yield return new WaitForSeconds(duration);
+    }
+
+    private float GetDeathClipDuration(float fallbackDuration)
+    {
+        if (animator == null || animator.runtimeAnimatorController == null)
+            return Mathf.Max(0.01f, fallbackDuration);
+
+        AnimationClip[] clips = animator.runtimeAnimatorController.animationClips;
+        float bestLength = 0f;
+
+        for (int i = 0; i < clips.Length; i++)
+        {
+            AnimationClip clip = clips[i];
+            if (clip == null)
+                continue;
+
+            if (clip.name.ToLowerInvariant().Contains("death"))
+                bestLength = Mathf.Max(bestLength, clip.length);
+        }
+
+        return Mathf.Max(0.01f, bestLength > 0f ? bestLength : fallbackDuration);
     }
 }

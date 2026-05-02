@@ -16,12 +16,16 @@ public class Enemy : MonoBehaviour, IEnemyMoveable, ITriggerCheckable
     public float InvestigationDuration { get; set; } = 3f;
     public EnemyAnimator EnemyAnimator { get; private set; }
 
+    private EnemyHealth _health;
+
     private void Awake()
     {
         EnemyAnimator = GetComponentInChildren<EnemyAnimator>();
 
         if (EnemyAnimator == null)
             EnemyAnimator = gameObject.AddComponent<EnemyAnimator>();
+
+        _health = GetComponent<EnemyHealth>();
 
         EnemyIdleBaseInstance = Instantiate(EnemyIdleBase);
         EnemyChaseBaseInstance = Instantiate(EnemyChaseBase);
@@ -34,16 +38,15 @@ public class Enemy : MonoBehaviour, IEnemyMoveable, ITriggerCheckable
         ChaseState = new EnemyChaseState(this, StateMachine);
         AttackState = new EnemyAttackState(this, StateMachine);
         InvestigateState = new EnemyInvestigateState(this, StateMachine);
-        // Ensure enemy has a body collider for hit detection
+
         if (GetComponent<Collider2D>() == null)
         {
             CircleCollider2D col = gameObject.AddComponent<CircleCollider2D>();
+            col.isTrigger = true;
+
             NavMeshAgent agent = GetComponent<NavMeshAgent>();
-            if (agent != null)
-                col.radius = agent.radius;
-            else
-                col.radius = 0.5f;
-        }   
+            col.radius = agent != null ? agent.radius : 0.5f;
+        }
     }
 
     private void Start()
@@ -60,11 +63,17 @@ public class Enemy : MonoBehaviour, IEnemyMoveable, ITriggerCheckable
 
     private void Update()
     {
+        if (_health != null && _health.IsDead)
+            return;
+
         StateMachine.CurrentEnemyState.FrameUpdate();
     }
 
     private void FixedUpdate()
     {
+        if (_health != null && _health.IsDead)
+            return;
+
         StateMachine.CurrentEnemyState.PhysicsUpdate();
     }
 

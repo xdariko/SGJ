@@ -10,11 +10,11 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 489669220150227655, guid: ec5a87fd4322b924baaf99a580fe611f, type: 3}
       propertyPath: m_Height
-      value: 0.8
+      value: 0.4
       objectReference: {fileID: 0}
     - target: {fileID: 489669220150227655, guid: ec5a87fd4322b924baaf99a580fe611f, type: 3}
       propertyPath: m_Radius
-      value: 0.4
+      value: 0.3
       objectReference: {fileID: 0}
     - target: {fileID: 489669220150227655, guid: ec5a87fd4322b924baaf99a580fe611f, type: 3}
       propertyPath: m_BaseOffset
@@ -129,6 +129,10 @@ PrefabInstance:
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5991959953902949259, guid: ec5a87fd4322b924baaf99a580fe611f, type: 3}
+      propertyPath: m_SpriteSortPoint
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5991959953902949259, guid: ec5a87fd4322b924baaf99a580fe611f, type: 3}
       propertyPath: m_WasSpriteAssigned
       value: 1
       objectReference: {fileID: 0}
@@ -136,16 +140,14 @@ PrefabInstance:
       propertyPath: m_Radius
       value: 2
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 342157078928359335, guid: ec5a87fd4322b924baaf99a580fe611f, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 3608691740417266209, guid: ec5a87fd4322b924baaf99a580fe611f, type: 3}
       insertIndex: -1
       addedObject: {fileID: 2094840521493734601}
-    - targetCorrespondingSourceObject: {fileID: 3608691740417266209, guid: ec5a87fd4322b924baaf99a580fe611f, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 1434683880125966626}
   m_SourcePrefab: {fileID: 100100000, guid: ec5a87fd4322b924baaf99a580fe611f, type: 3}
 --- !u!1 &662649370269247422 stripped
 GameObject:
@@ -174,15 +176,3 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
---- !u!114 &1434683880125966626
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 662649370269247422}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a3aa687e9a1559143bf7805b49752ef3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::EnemyAnimationEventProxy
