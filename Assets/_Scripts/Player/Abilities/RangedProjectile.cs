@@ -61,11 +61,21 @@ public class RangedProjectile : MonoBehaviour
 
         if (damageable != null)
         {
-            damageable.TakeDamage(damage);
+            float finalDamage = damage;
+
+            // Check for Boss vulnerability (Tank: vulnerable to ranged)
+            BossEnemy boss = other.GetComponent<BossEnemy>();
+            if (boss != null && boss.VulnerableToRanged)
+            {
+                finalDamage *= 2f; // Bonus damage when vulnerable
+                Debug.Log($"Boss is vulnerable to ranged! Bonus damage applied. Final: {finalDamage}");
+            }
+
+            damageable.TakeDamage(finalDamage);
 
             piercingCount--;
 
-            Debug.Log($"Projectile hit {other.name} for {damage} damage! Piercing left: {piercingCount}");
+            Debug.Log($"Projectile hit {other.name} for {finalDamage} damage! Piercing left: {piercingCount}");
 
             if (piercingCount <= 0)
                 DestroyProjectile();

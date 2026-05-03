@@ -13,6 +13,9 @@ public class HookProjectile : MonoBehaviour
     private bool isReturning = false;
     private GameObject hookedEnemy;
 
+    [Header("Hook Damage")]
+    [SerializeField] private float hookDamage = 5f;
+
     public GameObject Owner => owner;
 
     public void Initialize(Vector2 direction, float speed, float maxDistance, float duration, HookAbility ability, GameObject owner)
@@ -78,6 +81,22 @@ public class HookProjectile : MonoBehaviour
         // Check if hit enemy
         if (other.TryGetComponent<Enemy>(out var enemy) && !isReturning)
         {
+            // Deal damage to any enemy hit by hook
+            IDamageable damageable = other.GetComponent<IDamageable>();
+            if (damageable != null)
+            {
+                damageable.TakeDamage(hookDamage);
+                Debug.Log($"Hook hit {other.name} for {hookDamage} damage!");
+            }
+
+            // Check if it's an Agile boss (has BossEnemy with hook vulnerability)
+            BossEnemy boss = other.GetComponent<BossEnemy>();
+            if (boss != null && boss.UsesHookVulnerability)
+            {
+                boss.SetVulnerableToHook(true);
+                Debug.Log($"Agile boss is now vulnerable to hook");
+            }
+
             hookedEnemy = enemy.gameObject;
             ability.OnHookHitEnemy(hookedEnemy, this);
             StartReturning();

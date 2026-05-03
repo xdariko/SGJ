@@ -1,0 +1,166 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7d27280a89ca9f54884738970d39b730, type: 3}
+  m_Name: Boss2AgileController
+  m_EditorClassIdentifier: Assembly-CSharp::BossAttackControllerSO
+  postSpecialDelay: 0.5
+  abilities:
+  - Type: 3
+    Cooldown: 0
+    ChanceWeight: 0
+    RequireLineOfSight: 0
+    MinRange: 0
+    MaxRange: 0
+    meleeSlam:
+      damage: 0
+      radius: 0
+      windup: 0
+      attackDuration: 0
+      animationTrigger: 
+    ranged:
+      damage: 0
+      projectileSpeed: 0
+      projectileLifetime: 0
+      projectilePrefab: {fileID: 0}
+      fireRate: 0
+      burstCount: 0
+      animationTrigger: 
+    quickShot:
+      volleySize: 0
+      spreadAngle: 0
+      damage: 0
+      projectileSpeed: 0
+      projectileLifetime: 0
+      projectilePrefab: {fileID: 0}
+      volleyDelay: 0
+      animationTrigger: 
+    charge:
+      chargeSpeed: 0
+      chargeDuration: 0
+      chargeDamage: 0
+      aoeRadius: 0
+      windup: 0
+      vulnerableDuration: 0
+      animationTrigger: 
+    dash:
+      dashSpeed: 0
+      dashDuration: 0
+      dashAwayFromPlayer: 0
+      vulnerableDuration: 0
+      animationTrigger: 
+    summon:
+      minionPrefabs: []
+      waveSize: 0
+      summonDuration: 0
+      waitForMinionsDeath: 0
+      animationTrigger: 
+    currentCooldown: 0
+  - Type: 2
+    Cooldown: 0
+    ChanceWeight: 0
+    RequireLineOfSight: 0
+    MinRange: 0
+    MaxRange: 0
+    meleeSlam:
+      damage: 0
+      radius: 0
+      windup: 0
+      attackDuration: 0
+      animationTrigger: 
+    ranged:
+      damage: 0
+      projectileSpeed: 0
+      projectileLifetime: 0
+      projectilePrefab: {fileID: 0}
+      fireRate: 0
+      burstCount: 0
+      animationTrigger: 
+    quickShot:
+      volleySize: 0
+      spreadAngle: 0
+      damage: 0
+      projectileSpeed: 0
+      projectileLifetime: 0
+      projectilePrefab: {fileID: 0}
+      volleyDelay: 0
+      animationTrigger: 
+    charge:
+      chargeSpeed: 0
+      chargeDuration: 0
+      chargeDamage: 0
+      aoeRadius: 0
+      windup: 0
+      vulnerableDuration: 0
+      animationTrigger: 
+    dash:
+      dashSpeed: 0
+      dashDuration: 0
+      dashAwayFromPlayer: 0
+      vulnerableDuration: 0
+      animationTrigger: 
+    summon:
+      minionPrefabs: []
+      waveSize: 0
+      summonDuration: 0
+      waitForMinionsDeath: 0
+      animationTrigger: 
+    currentCooldown: 0
+  - Type: 1
+    Cooldown: 0
+    ChanceWeight: 0
+    RequireLineOfSight: 0
+    MinRange: 0
+    MaxRange: 0
+    meleeSlam:
+      damage: 0
+      radius: 0
+      windup: 0
+      attackDuration: 0
+      animationTrigger: 
+    ranged:
+      damage: 0
+      projectileSpeed: 0
+      projectileLifetime: 0
+      projectilePrefab: {fileID: 0}
+      fireRate: 0
+      burstCount: 0
+      animationTrigger: 
+    quickShot:
+      volleySize: 0
+      spreadAngle: 0
+      damage: 0
+      projectileSpeed: 0
+      projectileLifetime: 0
+      projectilePrefab: {fileID: 0}
+      volleyDelay: 0
+      animationTrigger: 
+    charge:
+      chargeSpeed: 0
+      chargeDuration: 0
+      chargeDamage: 0
+      aoeRadius: 0
+      windup: 0
+      vulnerableDuration: 0
+      animationTrigger: 
+    dash:
+      dashSpeed: 0
+      dashDuration: 0
+      dashAwayFromPlayer: 0
+      vulnerableDuration: 0
+      animationTrigger: 
+    summon:
+      minionPrefabs: []
+      waveSize: 0
+      summonDuration: 0
+      waitForMinionsDeath: 0
+      animationTrigger: 
+    currentCooldown: 0

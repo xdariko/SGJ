@@ -15,10 +15,10 @@ MonoBehaviour:
   MoveSpeed: 5
   SprintMultiplier: 1.5
   SprintStaminaCostPerSecond: 5
-  DashDistance: 10
+  DashDistance: 5
   DashDuration: 0.2
-  DashCooldown: 1
-  DashStaminaCost: 10
+  DashCooldown: 0
+  DashStaminaCost: 0
   maxHealth: 100
   maxStamina: 100
   staminaRegenRate: 2

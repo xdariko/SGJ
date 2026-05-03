@@ -23,6 +23,8 @@ public class EnemyNavMeshAgent2D : MonoBehaviour
         Agent.updateRotation = false;
         Agent.updateUpAxis = false;
 
+        Debug.Log($"[EnemyNavMeshAgent2D] {gameObject.name}: Awake - Agent: {(Agent != null ? "OK" : "NULL")}, Rigidbody2D: {(_rb != null ? "OK" : "NULL")}");
+
         if (_rb != null)
         {
             _rb.gravityScale = 0f;
