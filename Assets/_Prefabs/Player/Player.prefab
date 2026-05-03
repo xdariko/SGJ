@@ -136,6 +136,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Player
   playerDetails: {fileID: 11400000, guid: 325dbbb793ad87540a14d18d626aaa54, type: 2}
+  deathPanelPrefab: {fileID: 0}
   healthEvent: {fileID: 0}
   staminaEvent: {fileID: 0}
 --- !u!114 &6236936696444616352
@@ -256,7 +257,7 @@ Animator:
   m_GameObject: {fileID: 2153398447405136414}
   m_Enabled: 1
   m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: c6a11390935014d4d9a61161fafe02dd, type: 2}
+  m_Controller: {fileID: 9100000, guid: d936ed2811705784893f59d96a6b3ab5, type: 2}
   m_CullingMode: 0
   m_UpdateMode: 0
   m_ApplyRootMotion: 0
@@ -326,7 +327,7 @@ SpriteRenderer:
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
-  m_SpriteSortPoint: 0
+  m_SpriteSortPoint: 1
 --- !u!1 &4931124534402394375
 GameObject:
   m_ObjectHideFlags: 0
