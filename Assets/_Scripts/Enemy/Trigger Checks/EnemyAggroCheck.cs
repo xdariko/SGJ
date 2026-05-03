@@ -9,34 +9,35 @@ public class EnemyAggroCheck : MonoBehaviour
 
     private void Awake()
     {
-        PlayerTarget = GameObject.FindGameObjectWithTag("Player");
         _enemy = GetComponentInParent<Enemy>();
-        Debug.Log($"[EnemyAggroCheck] {gameObject.name}: Awake - PlayerTarget found: {PlayerTarget != null}, Enemy: {(_enemy != null ? _enemy.name : "NULL")}");
+        Debug.LogWarning($"[EnemyAggroCheck] {gameObject.name}: Awake - Enemy: {(_enemy != null ? _enemy.name : "NULL")}, collider: {GetComponent<Collider2D>() != null}");
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        if (collision.gameObject == PlayerTarget)
+        Debug.LogWarning($"[EnemyAggroCheck] {gameObject.name}: OnTriggerEnter2D with {collision.gameObject.name}, tag={collision.tag}");
+        
+        if (collision.CompareTag("Player"))
         {
-            Debug.Log($"[EnemyAggroCheck] {gameObject.name}: Player entered trigger, setting Aggro=true");
-            _enemy.SetAggroStatus(true);
+            Debug.LogWarning($"[EnemyAggroCheck] >>> Player detected! Setting Aggro=TRUE on {_enemy?.name}");
+            _enemy?.SetAggroStatus(true);
         }
     }
 
     private void OnTriggerStay2D(Collider2D collision)
     {
-        if (collision.gameObject == PlayerTarget)
+        if (collision.CompareTag("Player"))
         {
-            Debug.Log($"[EnemyAggroCheck] {gameObject.name}: Player STAYS in trigger (IsAggroed={_enemy.IsAggroed})");
+            Debug.Log($"[EnemyAggroCheck] {gameObject.name}: Player STAYS in trigger (IsAggroed={_enemy?.IsAggroed})");
         }
     }
 
     private void OnTriggerExit2D(Collider2D collision)
     {
-        if (collision.gameObject == PlayerTarget)
+        if (collision.CompareTag("Player"))
         {
-            Debug.Log($"[EnemyAggroCheck] {gameObject.name}: Player exited trigger, setting Aggro=false");
-            _enemy.SetAggroStatus(false);
+            Debug.LogWarning($"[EnemyAggroCheck] >>> Player exited trigger, setting Aggro=FALSE on {_enemy?.name}");
+            _enemy?.SetAggroStatus(false);
         }
     }
 }

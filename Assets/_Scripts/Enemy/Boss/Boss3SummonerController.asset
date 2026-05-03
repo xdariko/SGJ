@@ -15,11 +15,11 @@ MonoBehaviour:
   postSpecialDelay: 0.5
   abilities:
   - Type: 5
-    Cooldown: 0
+    Cooldown: 4
     ChanceWeight: 0
     RequireLineOfSight: 0
-    MinRange: 0
-    MaxRange: 0
+    MinRange: 1.5
+    MaxRange: 10
     meleeSlam:
       damage: 0
       radius: 0
@@ -58,18 +58,19 @@ MonoBehaviour:
       vulnerableDuration: 0
       animationTrigger: 
     summon:
-      minionPrefabs: []
-      waveSize: 0
-      summonDuration: 0
+      minionPrefabs:
+      - {fileID: 7478235714970971148, guid: b63bf1bbae0637a4d96c3ad7be1835c0, type: 3}
+      waveSize: 5
+      summonDuration: 2
       waitForMinionsDeath: 0
       animationTrigger: 
     currentCooldown: 0
   - Type: 1
-    Cooldown: 0
+    Cooldown: 3
     ChanceWeight: 0
     RequireLineOfSight: 0
-    MinRange: 0
-    MaxRange: 0
+    MinRange: 2
+    MaxRange: 10
     meleeSlam:
       damage: 0
       radius: 0
@@ -77,11 +78,11 @@ MonoBehaviour:
       attackDuration: 0
       animationTrigger: 
     ranged:
-      damage: 0
-      projectileSpeed: 0
-      projectileLifetime: 0
-      projectilePrefab: {fileID: 0}
-      fireRate: 0
+      damage: 15
+      projectileSpeed: 1
+      projectileLifetime: 3
+      projectilePrefab: {fileID: 3025899384600904615, guid: eea3b038e9321be458166dac742575cf, type: 3}
+      fireRate: 1
       burstCount: 0
       animationTrigger: 
     quickShot:

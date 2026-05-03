@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4a69f960c9914d848a9febdda2deac2a, type: 3}
+  m_Name: Agile Boss Profile
+  m_EditorClassIdentifier: Assembly-CSharp::AgileBossProfile
+  chaseSpeed: 3.5
+  stoppingDistance: 0.8
+  chaseUpdateRate: 0.3
+  teleportStepDistance: 2
+  minApproachDistance: 1
+  baseAttackCooldown: 1.5
+  specialAbilityCooldown: 4
+  aggroRadius: 12
+  strikeDistance: 2.5

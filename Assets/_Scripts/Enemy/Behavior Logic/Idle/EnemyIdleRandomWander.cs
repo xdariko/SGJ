@@ -113,6 +113,17 @@ public class EnemyIdleRandomWander : EnemyIdleSOBase
         if (_agent == null || !_agent.enabled || !_agent.isOnNavMesh)
             return;
 
+        // First check if we're already at a valid position on navmesh
+        if (NavMesh.SamplePosition(enemy.transform.position, out NavMeshHit currentHit, _sampleRadius, NavMesh.AllAreas))
+        {
+            // Valid position
+        }
+        else
+        {
+            Log("Enemy is not on NavMesh, cannot find wander destination.");
+            return;
+        }
+
         for (int i = 0; i < _sampleAttempts; i++)
         {
             Vector2 randomCircle = Random.insideUnitCircle * _wanderRange;
@@ -121,28 +132,28 @@ public class EnemyIdleRandomWander : EnemyIdleSOBase
             if (!NavMesh.SamplePosition(randomPoint, out NavMeshHit hit, _sampleRadius, NavMesh.AllAreas))
                 continue;
 
-            if (Vector3.Distance(enemy.transform.position, hit.position) < _minPointDistance)
+            float distance = Vector3.Distance(enemy.transform.position, hit.position);
+            if (distance < _minPointDistance)
                 continue;
 
-            NavMeshPath path = new NavMeshPath();
-            if (!_agent.CalculatePath(hit.position, path))
-                continue;
-
-            if (path.status != NavMeshPathStatus.PathComplete)
-                continue;
-
-            bool destinationSet;
+            // Use the NavMeshAgent2D's MoveTo which has better validation
+            bool destinationSet = false;
             if (_navMeshAgent2D != null)
                 destinationSet = _navMeshAgent2D.MoveTo(hit.position);
             else
             {
-                _agent.isStopped = false;
-                destinationSet = _agent.SetDestination(hit.position);
+                // Fallback to direct agent.SetDestination with pre-check
+                NavMeshPath path = new NavMeshPath();
+                if (_agent.CalculatePath(hit.position, path) && path.status == NavMeshPathStatus.PathComplete)
+                {
+                    _agent.isStopped = false;
+                    destinationSet = _agent.SetDestination(hit.position);
+                }
             }
 
             if (destinationSet)
             {
-                Log($"New wander destination: {hit.position}");
+                Log($"New wander destination: {hit.position} (distance: {distance:F2})");
                 return;
             }
         }

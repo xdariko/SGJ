@@ -126,9 +126,13 @@ public class BossAttackControllerSO : ScriptableObject
 
     public virtual void UpdateAbilities(BossEnemy boss, EnemyStateMachine stateMachine)
     {
-        Debug.Log($"[BossAttackController] UpdateAbilities: IsPerformingSpecial={boss.IsPerformingSpecial}, IsAggroed={boss.IsAggroed}, CurrentState={stateMachine?.CurrentEnemyState?.GetType().Name}");
+        Debug.LogWarning($"[BossAttackController] UpdateAbilities: IsPerformingSpecial={boss.IsPerformingSpecial}, IsAggroed={boss.IsAggroed}, CurrentState={stateMachine?.CurrentEnemyState?.GetType().Name}, InAttackState={stateMachine?.CurrentEnemyState is EnemyAttackState}");
 
-        if (boss == null) return;
+        if (boss == null) 
+        {
+            Debug.LogError("[BossAttackController] boss is NULL!");
+            return;
+        }
 
         // Update cooldowns always
         for (int i = 0; i < abilities.Count; i++)
@@ -140,24 +144,33 @@ public class BossAttackControllerSO : ScriptableObject
         }
 
         // If boss is performing a special ability, skip selecting new abilities
-        if (boss.IsPerformingSpecial) return;
+        if (boss.IsPerformingSpecial) 
+        {
+            Debug.Log("[BossAttackController] Skipping ability selection - IsPerformingSpecial=true");
+            return;
+        }
 
         // Try to find and execute an ability
         for (int i = 0; i < abilities.Count; i++)
         {
             BossAbilityEntry entry = abilities[i];
-            if (cooldownTimers[i] > 0f) continue;
+            if (cooldownTimers[i] > 0f)
+            {
+                Debug.Log($"[BossAttackController] Ability {i} ({entry.Type}) on cooldown: {cooldownTimers[i]:F2}s remaining");
+                continue;
+            }
 
             bool canUse = CanUseAbility(i, boss);
-            Debug.Log($"[BossAttackController] Checking ability {i} ({entry.Type}): CanUse={canUse}, Cooldown={cooldownTimers[i]:F2}");
+            Debug.LogWarning($"[BossAttackController] Checking ability {i} ({entry.Type}): CanUse={canUse}, Cooldown={cooldownTimers[i]:F2}");
 
             if (!canUse) continue;
 
             bool isSpecial = IsSpecialAbility(entry.Type);
+            Debug.LogWarning($"[BossAttackController] >>> Found usable ability: {entry.Type} (special={isSpecial})");
 
             if (isSpecial)
             {
-                Debug.Log($"[BossAttackController] >>> Using SPECIAL ability {i} ({entry.Type})");
+                Debug.LogWarning($"[BossAttackController] >>> USING SPECIAL ABILITY {i} ({entry.Type})");
                 cooldownTimers[i] = entry.Cooldown;
                 boss.StartSpecialAbility(i);
             }
@@ -166,14 +179,14 @@ public class BossAttackControllerSO : ScriptableObject
                 // Normal attack - ensure we set index before state change
                 if (stateMachine.CurrentEnemyState is not EnemyAttackState)
                 {
-                    Debug.Log($"[BossAttackController] >>> Using NORMAL attack {i} ({entry.Type}), changing to AttackState");
+                    Debug.LogWarning($"[BossAttackController] >>> USING NORMAL ATTACK {i} ({entry.Type}), changing to AttackState");
                     SetCurrentAttackIndex(i);
                     cooldownTimers[i] = entry.Cooldown;
                     stateMachine.ChangeState(boss.AttackState);
                 }
                 else
                 {
-                    Debug.Log($"[BossAttackController] Skipping attack {i} because already in AttackState");
+                    Debug.Log($"[BossAttackController] Skipping attack {i} because already in AttackState. Current ability will complete first.");
                 }
             }
 
@@ -292,7 +305,7 @@ public class BossAttackControllerSO : ScriptableObject
     public RangedParams GetRangedParams(int index) => abilities[index].ranged;
     public QuickShotParams GetQuickShotParams(int index) => abilities[index].quickShot;
 
-    protected virtual bool IsSpecialAbility(AbilityType type)
+    public virtual bool IsSpecialAbility(AbilityType type)
     {
         return type == AbilityType.Charge || type == AbilityType.Dash || type == AbilityType.Summon;
     }

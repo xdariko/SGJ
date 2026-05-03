@@ -21,6 +21,7 @@ public class EnemyAttackState : EnemyState
     public override void FrameUpdate()
     {
         base.FrameUpdate();
+        Debug.LogWarning($"[EnemyAttackState] FrameUpdate: Using attack logic type: {enemy.EnemyAttackBaseInstance.GetType().Name}");
         enemy.EnemyAttackBaseInstance.DoFrameUpdateLogic();
     }
 

@@ -1,9 +1,5 @@
 fileFormatVersion: 2
-<<<<<<<< HEAD:Assets/_Prefabs/KeyCard/KeyCard_Green.prefab.meta
-guid: e17f669da7d0d024790218ebc4da85fc
-========
-guid: ca03d4bcaadcf974aa82ff307e8c737d
->>>>>>>> origin/AllAtOnce:Assets/_Prefabs/Boss/Agile.prefab.meta
+guid: da290dea4b2c7b24cb4ee0c6e35b0adf
 PrefabImporter:
   externalObjects: {}
   userData: 

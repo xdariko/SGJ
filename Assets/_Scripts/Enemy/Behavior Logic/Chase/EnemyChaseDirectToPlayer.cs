@@ -45,12 +45,17 @@ public class EnemyChaseDirectToPlayer : EnemyChaseSOBase
 
     public override void DoFrameUpdateLogic()
     {
-        // Не вызываем base.DoFrameUpdateLogic(), потому что после ChangeState нельзя продолжать SetDestination.
+        Debug.Log($"[EnemyChaseDirectToPlayer] FrameUpdate: Aggroed={enemy.IsAggroed}, Striking={enemy.IsWithinStrikingDistance}, HasNavAgent={_navMeshAgent2D != null}");
+        
         if (playerTransform == null)
+        {
+            Debug.LogWarning("[EnemyChaseDirectToPlayer] playerTransform is NULL!");
             return;
+        }
 
         if (enemy.IsWithinStrikingDistance)
         {
+            Debug.Log("[EnemyChaseDirectToPlayer] Within striking distance - stopping and switching to Attack");
             _navMeshAgent2D?.Stop();
             enemy.MoveEnemy(Vector2.zero);
             enemy.StateMachine.ChangeState(enemy.AttackState);
@@ -59,6 +64,7 @@ public class EnemyChaseDirectToPlayer : EnemyChaseSOBase
 
         if (!enemy.IsAggroed)
         {
+            Debug.Log("[EnemyChaseDirectToPlayer] Not aggroed - switching to Investigate");
             _navMeshAgent2D?.Stop();
             enemy.MoveEnemy(Vector2.zero);
             enemy.InvestigationTargetPosition = playerTransform.position;
@@ -67,16 +73,14 @@ public class EnemyChaseDirectToPlayer : EnemyChaseSOBase
         }
 
         if (_agent == null || !_agent.enabled || !_agent.isOnNavMesh)
+        {
+            Debug.LogError($"[EnemyChaseDirectToPlayer] NavMeshAgent problems: agent={( _agent != null ? "exists" : "NULL")}, enabled={_agent?.enabled}, onNavMesh={_agent?.isOnNavMesh}");
             return;
+        }
 
         _agent.isStopped = false;
-
-        _refreshTimer -= Time.deltaTime;
-        if (_refreshTimer <= 0f)
-        {
-            _refreshTimer = _destinationRefreshRate;
-            _navMeshAgent2D?.MoveTo(playerTransform.position);
-        }
+        bool moved = _navMeshAgent2D?.MoveTo(playerTransform.position) ?? false;
+        Debug.Log($"[EnemyChaseDirectToPlayer] MoveTo result: {moved}, agent speed={_agent.speed}, dest={playerTransform.position}");
 
         FacePlayerByAgentVelocity();
     }

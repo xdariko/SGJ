@@ -40,13 +40,34 @@ public class Enemy : MonoBehaviour, IEnemyMoveable, ITriggerCheckable
         AttackState = new EnemyAttackState(this, StateMachine);
         InvestigateState = new EnemyInvestigateState(this, StateMachine);
 
-        if (GetComponent<Collider2D>() == null)
+        // Ensure we have a solid (non-trigger) collider for NavMeshAgent pathfinding
+        bool hasSolidCollider = false;
+        foreach (Collider2D col in GetComponents<Collider2D>())
         {
-            CircleCollider2D col = gameObject.AddComponent<CircleCollider2D>();
-            col.isTrigger = true;
+            if (!col.isTrigger)
+            {
+                hasSolidCollider = true;
+                break;
+            }
+        }
 
+        if (!hasSolidCollider)
+        {
+            CircleCollider2D solidCol = gameObject.AddComponent<CircleCollider2D>();
+            solidCol.isTrigger = false;
             NavMeshAgent agent = GetComponent<NavMeshAgent>();
-            col.radius = agent != null ? agent.radius : 0.5f;
+            float radius = agent != null ? agent.radius : 0.5f;
+            solidCol.radius = radius;
+            solidCol.offset = new Vector2(0, 0.21133333f); // Match typical 2D sprite pivot
+            Debug.LogWarning($"[Enemy] {name}: Added solid CircleCollider2D for NavMeshAgent (radius={radius})");
+        }
+
+        // Adjust NavMeshAgent baseOffset for 2D
+        NavMeshAgent agent2 = GetComponent<NavMeshAgent>();
+        if (agent2 != null && agent2.baseOffset > 0.5f)
+        {
+            Debug.LogWarning($"[Enemy] {name}: Adjusting NavMeshAgent baseOffset from {agent2.baseOffset} to 0.5f for 2D");
+            agent2.baseOffset = 0.5f;
         }
     }
 
@@ -87,10 +108,10 @@ public class Enemy : MonoBehaviour, IEnemyMoveable, ITriggerCheckable
 
     #region SO Variables
 
-    [SerializeField] private EnemyIdleSOBase EnemyIdleBase;
-    [SerializeField] private EnemyChaseSOBase EnemyChaseBase;
-    [SerializeField] private EnemyInvestigateSOBase EnemyInvestigateBase;
-    [SerializeField] private EnemyAttackSOBase EnemyAttackBase;
+    [SerializeField] protected EnemyIdleSOBase EnemyIdleBase;
+    [SerializeField] protected EnemyChaseSOBase EnemyChaseBase;
+    [SerializeField] protected EnemyInvestigateSOBase EnemyInvestigateBase;
+    [SerializeField] protected EnemyAttackSOBase EnemyAttackBase;
 
     public EnemyIdleSOBase EnemyIdleBaseInstance { get; set; }
     public EnemyChaseSOBase EnemyChaseBaseInstance { get; set; }

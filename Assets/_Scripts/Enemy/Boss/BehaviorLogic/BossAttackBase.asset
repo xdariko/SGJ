@@ -13,10 +13,10 @@ MonoBehaviour:
   m_Name: BossAttackBase
   m_EditorClassIdentifier: Assembly-CSharp::EnemyAttackSimpleMelee
   screamerSound: {fileID: 0}
-  _damage: 10
+  _damage: 30
   _attackCooldown: 1
-  _attackWindup: 0.2
+  _attackAnimationFallbackDuration: 0.2
   _attackRadius: 1
   _playerLayer:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 8

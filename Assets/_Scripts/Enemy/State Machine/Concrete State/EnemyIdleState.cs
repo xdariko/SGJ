@@ -26,13 +26,32 @@ public class EnemyIdleState : EnemyState
     public override void FrameUpdate()
     {
         base.FrameUpdate();
+        Debug.LogWarning($"[EnemyIdleState] FrameUpdate: Using idle logic type: {enemy.EnemyIdleBaseInstance.GetType().Name}");
         enemy.EnemyIdleBaseInstance.DoFrameUpdateLogic();
 
         // If enemy becomes aggroed, switch to Chase state
         if (enemy.IsAggroed)
         {
-            Debug.Log($"[EnemyIdleState] Enemy {enemy.name} is aggroed, switching to ChaseState");
-            enemy.StateMachine.ChangeState(enemy.ChaseState);
+            Debug.LogWarning($"[EnemyIdleState] >>> Enemy {enemy.name} is aggroed, attempting state change to Chase");
+            if (enemy.StateMachine == null)
+            {
+                Debug.LogError("[EnemyIdleState] StateMachine is NULL! Cannot change state.");
+                return;
+            }
+            if (enemy.ChaseState == null)
+            {
+                Debug.LogError("[EnemyIdleState] ChaseState is NULL! Initialize it in Awake.");
+                return;
+            }
+            // Avoid double-transition if already in Chase (e.g., DoFrameUpdateLogic already switched)
+            if (enemy.StateMachine.CurrentEnemyState != enemy.ChaseState)
+            {
+                enemy.StateMachine.ChangeState(enemy.ChaseState);
+            }
+            else
+            {
+                Debug.LogWarning("[EnemyIdleState] Already in ChaseState, skipping redundant transition");
+            }
         }
     }
 

@@ -19,12 +19,12 @@ MonoBehaviour:
     ChanceWeight: 5
     RequireLineOfSight: 0
     MinRange: 0
-    MaxRange: 4
+    MaxRange: 2
     meleeSlam:
       damage: 30
-      radius: 5
+      radius: 2
       windup: 0
-      attackDuration: 2
+      attackDuration: 1
       animationTrigger: 
     ranged:
       damage: 0
@@ -68,8 +68,8 @@ MonoBehaviour:
     Cooldown: 5
     ChanceWeight: 0
     RequireLineOfSight: 0
-    MinRange: 4
-    MaxRange: 10
+    MinRange: 2
+    MaxRange: 8
     meleeSlam:
       damage: 0
       radius: 0
@@ -94,12 +94,12 @@ MonoBehaviour:
       volleyDelay: 0
       animationTrigger: 
     charge:
-      chargeSpeed: 8
-      chargeDuration: 0.7
-      chargeDamage: 20
+      chargeSpeed: 7
+      chargeDuration: 0.5
+      chargeDamage: 10
       aoeRadius: 1.5
       windup: 0.4
-      vulnerableDuration: 2
+      vulnerableDuration: 0
       animationTrigger: 
     dash:
       dashSpeed: 0

@@ -1,9 +1,5 @@
 fileFormatVersion: 2
-<<<<<<<< HEAD:Assets/_Prefabs/KeyCard/KeyCard_Red.prefab.meta
-guid: 2d70430401cb65948a752ac5dda02000
-========
-guid: dcf3af502a0f996429358c178c76ec9d
->>>>>>>> origin/AllAtOnce:Assets/_Prefabs/Boss/Summoner.prefab.meta
+guid: 61f230f2e5e7a1c4a870ce5467d445d1
 PrefabImporter:
   externalObjects: {}
   userData: 

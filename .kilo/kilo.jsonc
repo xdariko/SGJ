@@ -1,0 +1,14 @@
+{
+  "$schema": "https://app.kilo.ai/config.json",
+  "mcp": {
+    "realvirtual-unity": {
+      "type": "local",
+      "command": [
+        "E:/SGJ26/Assets/StreamingAssets/realvirtual-MCP/python/python.exe",
+        "E:/SGJ26/Assets/StreamingAssets/realvirtual-MCP/unity_mcp_server.py"
+      ],
+      "enabled": true,
+      "timeout": 60000
+    }
+  }
+}
