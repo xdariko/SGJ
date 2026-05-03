@@ -23,6 +23,7 @@ public class EnemyChaseState : EnemyState
     public override void FrameUpdate()
     {
         base.FrameUpdate();
+        Debug.LogWarning($"[EnemyChaseState] FrameUpdate: Using chase logic type: {enemy.EnemyChaseBaseInstance.GetType().Name}");
         enemy.EnemyChaseBaseInstance.DoFrameUpdateLogic();
     }
 

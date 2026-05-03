@@ -2,6 +2,7 @@
   <Project Path="Assembly-CSharp.csproj" />
   <Project Path="NavMeshPlusEditor.csproj" />
   <Project Path="NavMeshPlus.csproj" />
-  <Project Path="McpUnity.Editor.csproj" />
+  <Project Path="io.realvirtual.mcp.editor.csproj" />
+  <Project Path="io.realvirtual.mcp.csproj" />
   <Project Path="DOTween.Modules.csproj" />
 </Solution>

@@ -305,7 +305,7 @@ public class BossAttackControllerSO : ScriptableObject
     public RangedParams GetRangedParams(int index) => abilities[index].ranged;
     public QuickShotParams GetQuickShotParams(int index) => abilities[index].quickShot;
 
-    protected virtual bool IsSpecialAbility(AbilityType type)
+    public virtual bool IsSpecialAbility(AbilityType type)
     {
         return type == AbilityType.Charge || type == AbilityType.Dash || type == AbilityType.Summon;
     }

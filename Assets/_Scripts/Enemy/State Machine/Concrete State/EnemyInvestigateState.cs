@@ -21,6 +21,7 @@ public class EnemyInvestigateState : EnemyState
     public override void FrameUpdate()
     {
         base.FrameUpdate();
+        Debug.LogWarning($"[EnemyInvestigateState] FrameUpdate: Using investigate logic type: {enemy.EnemyInvestigateBaseInstance.GetType().Name}");
         enemy.EnemyInvestigateBaseInstance.DoFrameUpdateLogic();
     }
 

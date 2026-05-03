@@ -1,0 +1,10 @@
+{
+  "mcpServers": {
+    "UnityMCP": {
+      "command": "E:/SGJ26/Assets/StreamingAssets/realvirtual-MCP/python/python.exe",
+      "args": [
+        "E:/SGJ26/Assets/StreamingAssets/realvirtual-MCP/unity_mcp_server.py"
+      ]
+    }
+  }
+}

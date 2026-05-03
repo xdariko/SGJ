@@ -15,11 +15,12 @@ public class BossAttackSO : EnemyAttackSOBase
         base.Initialize(gameObject, enemy);
         _enemy = enemy;
         _boss = enemy as BossEnemy;
+        Debug.LogWarning($"[BossAttackSO] Initialize: boss={_boss?.name}, enemy={_enemy?.name}");
     }
 
     public override void DoEnterLogic()
     {
-        Debug.LogWarning($"[BossAttackSO] DoEnterLogic called on {_enemy?.gameObject.name}");
+        Debug.LogWarning($"[BossAttackSO] DoEnterLogic on {_enemy?.gameObject.name}");
         
         if (_boss == null)
         {
@@ -27,15 +28,13 @@ public class BossAttackSO : EnemyAttackSOBase
             return;
         }
 
-        // Stop movement
         var nav = _boss.GetComponent<EnemyNavMeshAgent2D>();
-        Debug.Log($"[BossAttackSO] NavMeshAgent2D: {(nav != null ? "OK" : "NULL")}");
+        Debug.LogWarning($"[BossAttackSO] NavMeshAgent2D: {(nav != null ? "OK" : "NULL")}");
         nav?.Stop();
         _boss.MoveEnemy(Vector2.zero);
 
-        // Set animation state
         var animator = _boss.EnemyAnimator;
-        Debug.Log($"[BossAttackSO] EnemyAnimator: {(animator != null ? "OK" : "NULL")}");
+        Debug.LogWarning($"[BossAttackSO] EnemyAnimator: {(animator != null ? "OK" : "NULL")}");
         animator?.PlayState(EnemyAnimState.Attack);
 
         _controller = _boss.AttackController;
@@ -46,16 +45,34 @@ public class BossAttackSO : EnemyAttackSOBase
         }
 
         _currentAttackIndex = _controller.GetCurrentAttackIndex();
-        Debug.Log($"[BossAttackSO] CurrentAttackIndex: {_currentAttackIndex}");
+        Debug.LogWarning($"[BossAttackSO] CurrentAttackIndex: {_currentAttackIndex}");
         
         if (_currentAttackIndex < 0)
         {
-            Debug.LogError("[BossAttackSO] Invalid attack index! Check AttackController abilities list.");
-            return;
+            Debug.LogError("[BossAttackSO] Invalid attack index! Attempting to select fallback...");
+            
+            // Fallback: find first usable non-special attack
+            for (int i = 0; i < _controller.abilities.Count; i++)
+            {
+                var entry = _controller.abilities[i];
+                if (!_controller.IsSpecialAbility(entry.Type))
+                {
+                    _controller.SetCurrentAttackIndex(i);
+                    _currentAttackIndex = i;
+                    Debug.LogWarning($"[BossAttackSO] Fallback selected attack index {i} ({entry.Type})");
+                    break;
+                }
+            }
+            
+            if (_currentAttackIndex < 0)
+            {
+                Debug.LogError("[BossAttackSO] No valid attack index found and no fallback available! Check AttackController abilities list.");
+                return;
+            }
         }
 
         _attackRoutine = _boss.StartCoroutine(ExecuteAttackRoutine());
-        Debug.Log($"[BossAttackSO] Attack routine started for ability index {_currentAttackIndex}");
+        Debug.LogWarning($"[BossAttackSO] Attack routine started for ability index {_currentAttackIndex}");
     }
 
     public override void DoExitLogic()
@@ -71,9 +88,13 @@ public class BossAttackSO : EnemyAttackSOBase
     private IEnumerator ExecuteAttackRoutine()
     {
         BossAttackControllerSO.BossAbilityEntry entry = _controller.GetCurrentAttackEntry();
-        if (entry == null) yield break;
+        if (entry == null) 
+        {
+            Debug.LogError("[BossAttackSO] Entry is null!");
+            yield break;
+        }
 
-        Debug.Log($"[BossAttackSO] Executing attack {_currentAttackIndex}: {entry.Type}");
+        Debug.LogWarning($"[BossAttackSO] Executing attack {_currentAttackIndex}: Type={entry.Type}");
 
         switch (entry.Type)
         {
@@ -87,12 +108,31 @@ public class BossAttackSO : EnemyAttackSOBase
                 yield return ExecuteQuickShot(entry.quickShot);
                 break;
             default:
-                Debug.LogWarning($"[BossAttackSO] Unsupported attack type: {entry.Type}");
+                Debug.LogError($"[BossAttackSO] Unsupported attack type: {entry.Type}");
                 yield break;
         }
 
         // Return to chase after attack
-        _enemy.StateMachine.ChangeState(_boss.ChaseState);
+        Debug.LogWarning("[BossAttackSO] Attack complete, returning to ChaseState");
+        
+        // Safety checks
+        if (_enemy == null)
+        {
+            Debug.LogError("[BossAttackSO] _enemy is null!");
+            yield break;
+        }
+        if (_enemy.StateMachine == null)
+        {
+            Debug.LogError("[BossAttackSO] StateMachine is null!");
+            yield break;
+        }
+        if (_enemy.ChaseState == null)
+        {
+            Debug.LogError("[BossAttackSO] ChaseState is null! Initialize it in Awake.");
+            yield break;
+        }
+
+        _enemy.StateMachine.ChangeState(_enemy.ChaseState);
     }
 
     private IEnumerator ExecuteMeleeSlam(BossAttackControllerSO.MeleeSlamParams p)
@@ -103,16 +143,22 @@ public class BossAttackSO : EnemyAttackSOBase
         yield return new WaitForSeconds(p.windup);
 
         Collider2D[] hit = Physics2D.OverlapCircleAll((Vector2)_boss.transform.position, p.radius);
-        Debug.Log($"[BossAttackSO] MeleeSlam hit {hit.Length} colliders at radius {p.radius}");
+        Debug.LogError($"[BossAttackSO] MeleeSlam: radius={p.radius}, bossPos={_boss.transform.position}, hitsFound={hit.Length}");
         foreach (Collider2D col in hit)
         {
+            Debug.LogError($"[BossAttackSO] MeleeSlam hit: {col.gameObject.name}, tag={col.tag}, hasIDamageable={col.GetComponent<IDamageable>() != null}");
             if (col.CompareTag("Player"))
             {
                 IDamageable d = col.GetComponent<IDamageable>();
                 if (d != null)
                 {
-                    Debug.Log($"[BossAttackSO] >>> DAMAGE PLAYER {col.gameObject.name} for {p.damage}");
+                    Debug.LogError($"[BossAttackSO] >>> DEALING {p.damage} DAMAGE to {col.gameObject.name} via IDamageable");
                     d.TakeDamage(p.damage);
+                }
+                else
+                {
+                    Debug.LogWarning($"[BossAttackSO] Player {col.gameObject.name} has no IDamageable, trying SendMessage");
+                    col.SendMessage("TakeDamage", p.damage, SendMessageOptions.DontRequireReceiver);
                 }
             }
         }
@@ -122,7 +168,11 @@ public class BossAttackSO : EnemyAttackSOBase
 
     private IEnumerator ExecuteRanged(BossAttackControllerSO.RangedParams p)
     {
-        if (_boss.PlayerTarget == null) yield break;
+        if (_boss.PlayerTarget == null) 
+        {
+            Debug.LogWarning("[BossAttackSO] Ranged: PlayerTarget is null!");
+            yield break;
+        }
 
         if (_boss.Animator != null && !string.IsNullOrEmpty(p.animationTrigger))
             _boss.Animator.SetTrigger(p.animationTrigger);
@@ -132,7 +182,11 @@ public class BossAttackSO : EnemyAttackSOBase
 
         for (int i = 0; i < burstCount; i++)
         {
-            if (_boss.PlayerTarget == null) yield break;
+            if (_boss.PlayerTarget == null) 
+            {
+                Debug.LogWarning("[BossAttackSO] Ranged: PlayerTarget lost during burst");
+                yield break;
+            }
             FireProjectile(p);
             yield return new WaitForSeconds(interval);
         }
@@ -140,7 +194,11 @@ public class BossAttackSO : EnemyAttackSOBase
 
     private IEnumerator ExecuteQuickShot(BossAttackControllerSO.QuickShotParams p)
     {
-        if (_boss.PlayerTarget == null) yield break;
+        if (_boss.PlayerTarget == null) 
+        {
+            Debug.LogWarning("[BossAttackSO] QuickShot: PlayerTarget is null!");
+            yield break;
+        }
 
         if (_boss.Animator != null && !string.IsNullOrEmpty(p.animationTrigger))
             _boss.Animator.SetTrigger(p.animationTrigger);
@@ -151,7 +209,11 @@ public class BossAttackSO : EnemyAttackSOBase
 
         for (int i = 0; i < p.volleySize; i++)
         {
-            if (_boss.PlayerTarget == null) yield break;
+            if (_boss.PlayerTarget == null) 
+            {
+                Debug.LogWarning("[BossAttackSO] QuickShot: PlayerTarget lost during volley");
+                yield break;
+            }
             float angle = baseAngle + (i == 0 ? -halfSpread : (i == 1 ? 0f : halfSpread));
             Vector2 dir = new Vector2(Mathf.Cos(angle * Mathf.Deg2Rad), Mathf.Sin(angle * Mathf.Deg2Rad));
 
@@ -161,6 +223,11 @@ public class BossAttackSO : EnemyAttackSOBase
                 EnemyProjectile ep = proj.GetComponent<EnemyProjectile>();
                 if (ep == null) ep = proj.AddComponent<EnemyProjectile>();
                 ep.Initialize(dir, p.projectileSpeed, p.damage, p.projectileLifetime, _boss.gameObject);
+                Debug.LogWarning($"[BossAttackSO] QuickShot fired projectile {i+1}/{p.volleySize}");
+            }
+            else
+            {
+                Debug.LogError("[BossAttackSO] QuickShot: projectilePrefab is NULL!");
             }
 
             yield return new WaitForSeconds(p.volleyDelay);
@@ -169,13 +236,22 @@ public class BossAttackSO : EnemyAttackSOBase
 
     private void FireProjectile(BossAttackControllerSO.RangedParams p)
     {
-        if (p.projectilePrefab == null) return;
-        if (_boss.PlayerTarget == null) return;
+        if (p.projectilePrefab == null) 
+        {
+            Debug.LogError("[BossAttackSO] Ranged: projectilePrefab is NULL!");
+            return;
+        }
+        if (_boss.PlayerTarget == null) 
+        {
+            Debug.LogWarning("[BossAttackSO] Ranged: PlayerTarget is null");
+            return;
+        }
 
         Vector2 dir = ((Vector2)_boss.PlayerTarget.position - (Vector2)_boss.transform.position).normalized;
         GameObject proj = Object.Instantiate(p.projectilePrefab, _boss.transform.position, Quaternion.identity);
         EnemyProjectile ep = proj.GetComponent<EnemyProjectile>();
         if (ep == null) ep = proj.AddComponent<EnemyProjectile>();
         ep.Initialize(dir, p.projectileSpeed, p.damage, p.projectileLifetime, _boss.gameObject);
+        Debug.LogWarning($"[BossAttackSO] Ranged fired projectile");
     }
 }

@@ -25,6 +25,7 @@ public class BossEnemy : Enemy
 
     protected override void Awake()
     {
+        // Base Awake creates all states and StateMachine using the ScriptableObjects assigned in inspector
         base.Awake();
         Animator = GetComponent<Animator>();
         Debug.Log($"[BossEnemy] Awake: Animator present: {Animator != null}");
@@ -36,14 +37,14 @@ public class BossEnemy : Enemy
         Debug.Log($"[BossEnemy] Start: attackController={(attackController != null ? attackController.name : "NULL")}");
         
         // Diagnostic checks
-        Debug.Log($"[BossEnemy] Components check:");
-        Debug.Log($"  - NavMeshAgent: {(GetComponent<UnityEngine.AI.NavMeshAgent>() != null ? "OK" : "MISSING")}");
-        Debug.Log($"  - EnemyNavMeshAgent2D: {(GetComponent<EnemyNavMeshAgent2D>() != null ? "OK" : "MISSING")}");
-        Debug.Log($"  - Rigidbody2D: {(GetComponent<Rigidbody2D>() != null ? "OK" : "MISSING")}");
-        Debug.Log($"  - Animator: {(GetComponent<Animator>() != null ? "OK" : "MISSING")}");
-        Debug.Log($"  - EnemyHealth: {(GetComponent<EnemyHealth>() != null ? "OK" : "MISSING")}");
-        Debug.Log($"  - EnemyAggroCheck: {(GetComponentInChildren<EnemyAggroCheck>(true) != null ? "OK" : "MISSING")}");
-        Debug.Log($"  - EnemyStrikingDistanceCheck: {(GetComponentInChildren<EnemyStrikingDistanceCheck>(true) != null ? "OK" : "MISSING")}");
+        Debug.Log($"[BossEnemy] === COMPONENT CHECK ===");
+        Debug.Log($"  NavMeshAgent: {(GetComponent<UnityEngine.AI.NavMeshAgent>() != null ? "OK" : "MISSING")}");
+        Debug.Log($"  EnemyNavMeshAgent2D: {(GetComponent<EnemyNavMeshAgent2D>() != null ? "OK" : "MISSING")}");
+        Debug.Log($"  Rigidbody2D: {(GetComponent<Rigidbody2D>() != null ? "OK" : "MISSING")}");
+        Debug.Log($"  Animator: {(GetComponent<Animator>() != null ? "OK" : "MISSING")}");
+        Debug.Log($"  EnemyHealth: {(GetComponent<EnemyHealth>() != null ? "OK" : "MISSING")}");
+        Debug.Log($"  EnemyAggroCheck: {(GetComponentInChildren<EnemyAggroCheck>(true) != null ? "OK" : "MISSING")}");
+        Debug.Log($"  EnemyStrikingDistanceCheck: {(GetComponentInChildren<EnemyStrikingDistanceCheck>(true) != null ? "OK" : "MISSING")}");
         
         if (attackController != null)
         {
@@ -60,17 +61,32 @@ public class BossEnemy : Enemy
         }
         else
         {
-            Debug.LogWarning($"[BossEnemy] AttackController is NULL! Please assign BossAttackControllerSO.", this);
+            Debug.LogError($"[BossEnemy] AttackController is NULL! Assign BossAttackControllerSO in inspector!", this);
         }
 
-        Debug.Log($"[BossEnemy] AttackBase check: EnemyAttackBaseInstance type: {EnemyAttackBaseInstance?.GetType().Name ?? "NULL"}");
-        Debug.Log($"[BossEnemy] AttackBase is BossAttackSO: {EnemyAttackBaseInstance is BossAttackSO}");
+        Debug.Log($"[BossEnemy] === SCRIPTABLEOBJECT ASSIGNMENTS ===");
+        Debug.Log($"  EnemyAttackBase: {base.EnemyAttackBase?.name ?? "NULL"} | Type: {base.EnemyAttackBase?.GetType().Name ?? "NULL"}");
+        Debug.Log($"  EnemyChaseBase: {base.EnemyChaseBase?.name ?? "NULL"} | Type: {base.EnemyChaseBase?.GetType().Name ?? "NULL"}");
+        Debug.Log($"  EnemyIdleBase: {base.EnemyIdleBase?.name ?? "NULL"} | Type: {base.EnemyIdleBase?.GetType().Name ?? "NULL"}");
+        Debug.Log($"  EnemyInvestigateBase: {base.EnemyInvestigateBase?.name ?? "NULL"} | Type: {base.EnemyInvestigateBase?.GetType().Name ?? "NULL"}");
+        
+        Debug.Log($"[BossEnemy] AttackBaseInstance: {EnemyAttackBaseInstance?.GetType().Name ?? "NULL"}");
+        Debug.Log($"[BossEnemy] ChaseBaseInstance: {EnemyChaseBaseInstance?.GetType().Name ?? "NULL"}");
+        Debug.Log($"[BossEnemy] IdleBaseInstance: {EnemyIdleBaseInstance?.GetType().Name ?? "NULL"}");
+        Debug.Log($"[BossEnemy] InvestigateBaseInstance: {EnemyInvestigateBaseInstance?.GetType().Name ?? "NULL"}");
+        
+        // Validate states created
+        Debug.Log($"[BossEnemy] StateMachine: {(StateMachine != null ? "OK" : "NULL")}");
+        Debug.Log($"[BossEnemy] IdleState: {(IdleState != null ? "OK" : "NULL")}");
+        Debug.Log($"[BossEnemy] ChaseState: {(ChaseState != null ? "OK" : "NULL")}");
+        Debug.Log($"[BossEnemy] AttackState: {(AttackState != null ? "OK" : "NULL")}");
+        Debug.Log($"[BossEnemy] InvestigateState: {(InvestigateState != null ? "OK" : "NULL")}");
         
         VulnerableToRanged = false;
         VulnerableToHook = false;
     }
 
-    private new void Update()
+    protected override void Update()
     {
         base.Update();
         if (!IsPerformingSpecial)
@@ -80,7 +96,7 @@ public class BossEnemy : Enemy
         Debug.Log($"[BossEnemy] Update: IsAggroed={IsAggroed}, State={StateMachine?.CurrentEnemyState?.GetType().Name}, PlayerTargetExists={PlayerTarget != null}, IsPerformingSpecial={IsPerformingSpecial}");
     }
 
-    private new void FixedUpdate()
+    protected override void FixedUpdate()
     {
         base.FixedUpdate();
     }
