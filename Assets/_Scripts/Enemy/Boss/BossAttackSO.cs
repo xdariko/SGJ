@@ -20,7 +20,7 @@ public class BossAttackSO : EnemyAttackSOBase
 
     public override void DoEnterLogic()
     {
-        Debug.LogWarning($"[BossAttackSO] DoEnterLogic on {_enemy?.gameObject.name}");
+        Debug.LogWarning($"[BossAttackSO] DoEnterLogic on {_enemy?.gameObject.name} - STOPPING MOVEMENT");
         
         if (_boss == null)
         {
@@ -29,9 +29,11 @@ public class BossAttackSO : EnemyAttackSOBase
         }
 
         var nav = _boss.GetComponent<EnemyNavMeshAgent2D>();
-        Debug.LogWarning($"[BossAttackSO] NavMeshAgent2D: {(nav != null ? "OK" : "NULL")}");
+        Debug.LogWarning($"[BossAttackSO] NavMeshAgent2D before stop: {(nav != null ? "OK" : "NULL")}, isStopped={(nav != null && nav.Agent != null ? nav.Agent.isStopped.ToString() : "N/A")}");
         nav?.Stop();
         _boss.MoveEnemy(Vector2.zero);
+        Debug.LogWarning($"[BossAttackSO] Movement stopped for attack");
+        Debug.LogWarning($"[BossAttackSO] Movement stopped for attack");
 
         var animator = _boss.EnemyAnimator;
         Debug.LogWarning($"[BossAttackSO] EnemyAnimator: {(animator != null ? "OK" : "NULL")}");
@@ -82,6 +84,20 @@ public class BossAttackSO : EnemyAttackSOBase
             _boss.StopCoroutine(_attackRoutine);
             _attackRoutine = null;
         }
+        
+        // Ensure the boss can move again after attack
+        var nav = _boss.GetComponent<EnemyNavMeshAgent2D>();
+        if (nav != null && nav.Agent != null)
+        {
+            Debug.LogWarning($"[BossAttackSO] DoExitLogic: BEFORE - isStopped={nav.Agent.isStopped}, enabled={nav.Agent.enabled}, isOnNavMesh={nav.Agent.isOnNavMesh}");
+            nav.Agent.isStopped = false;
+            Debug.LogWarning($"[BossAttackSO] DoExitLogic: AFTER - isStopped={nav.Agent.isStopped}");
+        }
+        else
+        {
+            Debug.LogWarning($"[BossAttackSO] DoExitLogic: navAgent2D is null or Agent is null");
+        }
+        
         base.DoExitLogic();
     }
 
@@ -142,14 +158,14 @@ public class BossAttackSO : EnemyAttackSOBase
 
         yield return new WaitForSeconds(p.windup);
 
-        // Find all colliders in radius, then filter manually
+        // Find all colliders in radius
         Collider2D[] allHit = Physics2D.OverlapCircleAll((Vector2)_boss.transform.position, p.radius);
         Debug.LogWarning($"[BossAttackSO] MeleeSlam: radius={p.radius}, bossPos={_boss.transform.position}, allHits={allHit.Length}");
         
         int dealtDamageCount = 0;
         foreach (Collider2D col in allHit)
         {
-            // Skip triggers (AggroRadius, StrikingDistance)
+            // Skip triggers (AggroRadius, StrikingDistance, etc.)
             if (col.isTrigger)
             {
                 Debug.LogWarning($"[BossAttackSO] MeleeSlam skipped trigger: {col.gameObject.name}");
@@ -160,6 +176,13 @@ public class BossAttackSO : EnemyAttackSOBase
             if (col.transform.root == _boss.transform.root)
             {
                 Debug.LogWarning($"[BossAttackSO] MeleeSlam skipped self/child: {col.gameObject.name}");
+                continue;
+            }
+            
+            // Only damage Player - bosses should not damage other enemies
+            if (!col.CompareTag("Player"))
+            {
+                Debug.LogWarning($"[BossAttackSO] MeleeSlam skipped non-Player: {col.gameObject.name} (tag={col.tag})");
                 continue;
             }
             

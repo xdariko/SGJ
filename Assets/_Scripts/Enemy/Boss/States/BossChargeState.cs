@@ -51,14 +51,20 @@ public class BossChargeState : BossSpecialState
             boss.RB.linearVelocity = Vector2.zero;
         }
 
-        // AoE damage at impact location
+        // AoE damage at impact location - ONLY damage Player
         Collider2D[] hits = Physics2D.OverlapCircleAll((Vector2)boss.transform.position, chargeParams.aoeRadius);
         foreach (Collider2D col in hits)
         {
+            // Skip self
             if (col.gameObject == boss.gameObject) continue;
-            if (col.CompareTag("Player") || col.CompareTag("PlayerProjectile")) continue;
-            IDamageable d = col.GetComponent<IDamageable>();
-            d?.TakeDamage(chargeParams.chargeDamage);
+            
+            // Only damage Player
+            if (col.CompareTag("Player"))
+            {
+                IDamageable d = col.GetComponent<IDamageable>();
+                if (d != null)
+                    d.TakeDamage(chargeParams.chargeDamage);
+            }
         }
 
         // Return to normal behavior

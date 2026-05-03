@@ -29,6 +29,14 @@ public class BossEnemy : Enemy
         base.Awake();
         Animator = GetComponent<Animator>();
         Debug.Log($"[BossEnemy] Awake: Animator present: {Animator != null}");
+
+        // Ensure EnemyNavMeshAgent2D component exists
+        EnemyNavMeshAgent2D navAgent2D = GetComponent<EnemyNavMeshAgent2D>();
+        if (navAgent2D == null)
+        {
+            Debug.LogWarning($"[BossEnemy] {name}: EnemyNavMeshAgent2D not found, adding it automatically.");
+            gameObject.AddComponent<EnemyNavMeshAgent2D>();
+        }
     }
 
     protected override void Start()

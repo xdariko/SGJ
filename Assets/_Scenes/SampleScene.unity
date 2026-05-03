@@ -2242,13 +2242,17 @@ PrefabInstance:
       propertyPath: EnemyInvestigateBase
       value: 
       objectReference: {fileID: 11400000, guid: e4d55080f397d8148b98de2babc04789, type: 2}
+    - target: {fileID: 570775868193451794, guid: 8ec4049c109a721408ae1a578194f69f, type: 3}
+      propertyPath: m_Radius
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 2957922076372244091, guid: 8ec4049c109a721408ae1a578194f69f, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -3.8229637
+      value: 1.72
       objectReference: {fileID: 0}
     - target: {fileID: 2957922076372244091, guid: 8ec4049c109a721408ae1a578194f69f, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -4.819135
+      value: -7.4
       objectReference: {fileID: 0}
     - target: {fileID: 2957922076372244091, guid: 8ec4049c109a721408ae1a578194f69f, type: 3}
       propertyPath: m_LocalPosition.z
@@ -7774,7 +7778,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7478235714970971148, guid: b63bf1bbae0637a4d96c3ad7be1835c0, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8861619515131884537, guid: b63bf1bbae0637a4d96c3ad7be1835c0, type: 3}
       propertyPath: m_LocalPosition.x

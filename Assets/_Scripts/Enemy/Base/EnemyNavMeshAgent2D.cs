@@ -91,15 +91,16 @@ public class EnemyNavMeshAgent2D : MonoBehaviour
             return true; // Consider it a success since we're already there
         }
 
-        // Calculate path first to verify it's valid before committing
+        // Calculate path first to verify it's at least partially valid (not invalid)
         NavMeshPath path = new NavMeshPath();
         if (Agent.CalculatePath(destination, path))
         {
-            if (path.status != NavMeshPathStatus.PathComplete)
+            if (path.status == NavMeshPathStatus.PathInvalid)
             {
-                Log($"Path is not complete: {path.status}");
+                Log($"Path is invalid: {path.status}");
                 return false;
             }
+            // Accept PathComplete and PathPartial
         }
         else
         {
