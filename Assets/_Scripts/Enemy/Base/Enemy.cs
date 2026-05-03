@@ -28,11 +28,18 @@ public class Enemy : MonoBehaviour, IEnemyMoveable, ITriggerCheckable
 
         _health = GetComponent<EnemyHealth>();
 
-        EnemyIdleBaseInstance = Instantiate(EnemyIdleBase);
-        EnemyChaseBaseInstance = Instantiate(EnemyChaseBase);
-        EnemyInvestigateBaseInstance = Instantiate(EnemyInvestigateBase);
-        EnemyAttackBaseInstance = Instantiate(EnemyAttackBase);
-        
+        // Instantiate ScriptableObject states with fallback to default if not assigned
+        EnemyIdleBaseInstance = EnemyIdleBase != null ? Instantiate(EnemyIdleBase) : CreateDefault<EnemyIdleSOBase>();
+        EnemyChaseBaseInstance = EnemyChaseBase != null ? Instantiate(EnemyChaseBase) : CreateDefault<EnemyChaseSOBase>();
+        EnemyInvestigateBaseInstance = EnemyInvestigateBase != null ? Instantiate(EnemyInvestigateBase) : CreateDefault<EnemyInvestigateSOBase>();
+        EnemyAttackBaseInstance = EnemyAttackBase != null ? Instantiate(EnemyAttackBase) : CreateDefault<EnemyAttackSOBase>();
+
+        // Log warnings for missing assignments
+        if (EnemyIdleBase == null) Debug.LogWarning($"[Enemy] {name}: EnemyIdleBase is not assigned. Using default.", this);
+        if (EnemyChaseBase == null) Debug.LogWarning($"[Enemy] {name}: EnemyChaseBase is not assigned. Using default.", this);
+        if (EnemyInvestigateBase == null) Debug.LogWarning($"[Enemy] {name}: EnemyInvestigateBase is not assigned. Using default.", this);
+        if (EnemyAttackBase == null) Debug.LogWarning($"[Enemy] {name}: EnemyAttackBase is not assigned. Using default.", this);
+
         StateMachine = new EnemyStateMachine();
 
         IdleState = new EnemyIdleState(this, StateMachine);
@@ -182,4 +189,11 @@ public class Enemy : MonoBehaviour, IEnemyMoveable, ITriggerCheckable
 
     #endregion
 
+    // Helper method to create a default ScriptableObject instance when asset is not assigned
+    private T CreateDefault<T>() where T : ScriptableObject
+    {
+        T obj = ScriptableObject.CreateInstance<T>();
+        obj.name = $"Default_{typeof(T).Name}";
+        return obj;
+    }
 }

@@ -284,7 +284,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5017480c25c7a234a9de93bfc2911445, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BossEnemy
-  EnemyIdleBase: {fileID: 11400000, guid: 87209463eb72e6e408cbfd4b2236a35e, type: 2}
+  EnemyIdleBase: {fileID: 11400000, guid: 14054160dd338ba44b9adae7aadcac88, type: 2}
   EnemyChaseBase: {fileID: 11400000, guid: 3c95e102c521e1e42b171e24321cd9cf, type: 2}
   EnemyInvestigateBase: {fileID: 11400000, guid: e4d55080f397d8148b98de2babc04789, type: 2}
   EnemyAttackBase: {fileID: 11400000, guid: afacd6e8541c11e40aac866fb3e61938, type: 2}
@@ -308,7 +308,7 @@ MonoBehaviour:
   _maxHealth: 100
   _destroyOnDeath: 1
   _destroyDelay: 0.1
-  _damagePopupPrefab: {fileID: 0}
+  _damagePopupPrefab: {fileID: 1745006277687862475, guid: 253cecb3047f4734dad01b28ecb152dc, type: 3}
   _damagePopupOffset: {x: 0, y: 0.75, z: 0}
   _damagePopupRandomX: 0.25
 --- !u!195 &4334195195520851418
