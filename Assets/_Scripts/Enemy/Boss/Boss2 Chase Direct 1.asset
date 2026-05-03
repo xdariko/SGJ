@@ -13,6 +13,9 @@ MonoBehaviour:
   m_Name: Boss2 Chase Direct 1
   m_EditorClassIdentifier: Assembly-CSharp::BossChaseSO
   profile: {fileID: 11400000, guid: acb104e152781524e8e6f9808648bf7b, type: 2}
+  chaseStyle: 1
+  preferredDistanceMin: 4
+  preferredDistanceMax: 8
   movementSpeed: 10
   destinationRefreshRate: 0.5
   teleportDistance: 0.5

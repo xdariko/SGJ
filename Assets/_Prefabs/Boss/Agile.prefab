@@ -304,7 +304,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fc4d15a6980920448be4b84b2d03cf1c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyHealth
-  _maxHealth: 30
+  _maxHealth: 100
   _destroyOnDeath: 1
   _destroyDelay: 0.1
   _damagePopupPrefab: {fileID: 0}

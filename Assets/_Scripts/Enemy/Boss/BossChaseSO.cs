@@ -4,8 +4,20 @@ using UnityEngine.AI;
 [CreateAssetMenu(fileName = "Boss Chase Direct", menuName = "Enemy Logic/Boss/Boss Chase Direct")]
 public class BossChaseSO : EnemyChaseSOBase
 {
+    public enum ChaseStyle
+    {
+        AlwaysApproach,      // Tank: всегда сближается с игроком
+        KeepDistance,        // Agile/Summoner: держит дистанцию, не подходит слишком близко
+        Mixed                // Смешанный: приближается, затем отступает
+    }
+
     [Header("Profile")]
     [SerializeField] private BossProfileSO profile; // Настройки для этого босса
+    [SerializeField] private ChaseStyle chaseStyle = ChaseStyle.AlwaysApproach;
+    
+    [Header("Distance Settings (for KeepDistance)")]
+    [SerializeField] private float preferredDistanceMin = 2f;
+    [SerializeField] private float preferredDistanceMax = 4f;
     
     [Header("Runtime (Auto-configured from profile)")]
     [SerializeField] private float movementSpeed = 2f;
@@ -35,8 +47,22 @@ public class BossChaseSO : EnemyChaseSOBase
             movementSpeed = profile.chaseSpeed;
             destinationRefreshRate = profile.chaseUpdateRate;
             teleportDistance = profile.teleportStepDistance;
-            snapToNavMeshRadius = 2f; // Could also be in profile
-            Debug.LogWarning($"[BossChaseSO] Using profile: {profile.name}");
+            snapToNavMeshRadius = 2f;
+            
+            // Auto-set chase style based on profile parameters if not manually set
+            if (chaseStyle == ChaseStyle.AlwaysApproach) // Only auto-set if not explicitly configured
+            {
+                if (profile.minApproachDistance < 1f)
+                {
+                    chaseStyle = ChaseStyle.AlwaysApproach; // Tank
+                }
+                else if (profile.stoppingDistance > 2f)
+                {
+                    chaseStyle = ChaseStyle.KeepDistance; // Ranged/Summoner
+                }
+            }
+
+            Debug.LogWarning($"[BossChaseSO] Using profile: {profile.name}, Style: {chaseStyle}");
         }
         else
         {
@@ -47,8 +73,7 @@ public class BossChaseSO : EnemyChaseSOBase
         agent = gameObject.GetComponent<NavMeshAgent>();
 
         Debug.LogWarning($"[BossChaseSO] Initialize for {gameObject.name}");
-        Debug.LogWarning($"  Settings: speed={movementSpeed}, refreshRate={destinationRefreshRate}, teleportDist={teleportDistance}");
-        Debug.LogWarning($"  navAgent2D: {(navAgent2D != null ? "OK" : "NULL")}, agent: {(agent != null ? "OK" : "NULL")}");
+        Debug.LogWarning($"  Settings: speed={movementSpeed}, refreshRate={destinationRefreshRate}, teleportDist={teleportDistance}, style={chaseStyle}");
 
         if (agent != null)
         {
@@ -71,7 +96,7 @@ public class BossChaseSO : EnemyChaseSOBase
             agent.isStopped = true;
         }
 
-        // First teleport towards player
+        // First teleport towards/away from player
         if (enemy.PlayerTarget != null)
         {
             PerformTeleportStep();
@@ -86,21 +111,58 @@ public class BossChaseSO : EnemyChaseSOBase
         Vector3 playerPos = enemy.PlayerTarget.position;
         float currentDistance = Vector3.Distance(bossPos, playerPos);
 
-        // Already close enough?
+        float targetDistance = currentDistance;
         float minApproach = profile != null ? profile.minApproachDistance : 0.8f;
-        if (currentDistance <= minApproach)
+        float maxDistance = profile != null ? profile.stoppingDistance : 1f;
+
+        // Determine desired distance based on chase style
+        switch (chaseStyle)
         {
-            Debug.LogWarning($"[BossChaseSO] Within approach distance ({currentDistance:F2}m), not teleporting");
+            case ChaseStyle.AlwaysApproach:
+                // Always get closer until within striking distance
+                targetDistance = Mathf.Max(minApproach, currentDistance - teleportDistance);
+                break;
+
+            case ChaseStyle.KeepDistance:
+                // Maintain distance between minApproach and stoppingDistance (from profile)
+                if (currentDistance > maxDistance)
+                {
+                    // Too far - approach
+                    targetDistance = Mathf.Max(minApproach, currentDistance - teleportDistance);
+                }
+                else if (currentDistance < minApproach)
+                {
+                    // Too close - retreat!
+                    targetDistance = currentDistance + teleportDistance;
+                }
+                else
+                {
+                    // In preferred range - don't move
+                    Debug.LogWarning($"[BossChaseSO] In preferred range ({currentDistance:F2}m), not teleporting");
+                    return;
+                }
+                break;
+
+            case ChaseStyle.Mixed:
+                // Approach until minApproach, then retreat
+                if (currentDistance > minApproach + 1f)
+                {
+                    targetDistance = Mathf.Max(minApproach, currentDistance - teleportDistance);
+                }
+                else
+                {
+                    targetDistance = currentDistance + teleportDistance;
+                }
+                break;
+        }
+
+        // Don't teleport if already at ideal distance
+        if (Mathf.Abs(currentDistance - targetDistance) < 0.3f)
+        {
             return;
         }
 
         Vector3 directionToPlayer = (playerPos - bossPos).normalized;
-        
-        // Determine target: maintain some distance from player
-        float targetDistance = Mathf.Max(
-            profile != null ? profile.minApproachDistance : 0.8f, 
-            currentDistance - teleportDistance
-        );
         Vector3 targetPos = playerPos - directionToPlayer * targetDistance;
 
         // Snap to NavMesh
@@ -111,10 +173,15 @@ public class BossChaseSO : EnemyChaseSOBase
 
             // Teleport (instant move)
             _boss.transform.position = finalPos;
-            Debug.LogWarning($"[BossChaseSO] Teleported to {finalPos} (dist to player: {Vector3.Distance(finalPos, playerPos):F2}m)");
+            Debug.LogWarning($"[BossChaseSO] Teleported from {bossPos:F2} to {finalPos:F2} (dist to player: {Vector3.Distance(finalPos, playerPos):F2}m, style={chaseStyle})");
 
-            // Face player
+            // Face direction based on movement
             Vector2 faceDir = (Vector2)(playerPos - finalPos).normalized;
+            if (chaseStyle == ChaseStyle.KeepDistance && currentDistance < minApproach)
+            {
+                // Retreat - face away from player
+                faceDir = -faceDir;
+            }
             if (faceDir.sqrMagnitude > 0.01f)
             {
                 _boss.CheckForLeftOrRightFacing(faceDir);
@@ -139,7 +206,7 @@ public class BossChaseSO : EnemyChaseSOBase
 
         if (enemy.IsWithinStrikingDistance)
         {
-            Debug.Log("[BossChaseSO] Within striking distance, stopping and switching to Attack");
+            Debug.Log("[BossChaseSO] Within striking distance, switching to Attack");
             enemy.MoveEnemy(Vector2.zero);
             
             // Select attack

@@ -22,6 +22,7 @@ GameObject:
   - component: {fileID: 4313297476557741172}
   - component: {fileID: 3942231251381675188}
   - component: {fileID: 5463092998413035805}
+  - component: {fileID: 5252078894450947808}
   m_Layer: 3
   m_Name: Player
   m_TagString: Player
@@ -327,6 +328,18 @@ SpriteRenderer:
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
   m_SpriteSortPoint: 0
+--- !u!114 &5252078894450947808
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2153398447405136414}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c72db4f32d646f44b94666287f50a992, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerInvincibility
 --- !u!1 &4931124534402394375
 GameObject:
   m_ObjectHideFlags: 0
