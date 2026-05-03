@@ -6,6 +6,7 @@ using UnityEngine;
 public class Player : MonoBehaviour
 {
     [SerializeField] private PlayerDetailsSO playerDetails;
+    [SerializeField] private GameObject deathPanelPrefab;
 
     [HideInInspector] public HealthEvent healthEvent;
     [HideInInspector] public StaminaEvent staminaEvent;
@@ -16,6 +17,7 @@ public class Player : MonoBehaviour
     private float currentStamina;
     private bool isInvincible = false;
     private bool isFacingRight = true;
+    private bool isDead = false;
 
     public float CurrentHealth => currentHealth;
     public float CurrentStamina => currentStamina;
@@ -76,7 +78,7 @@ public class Player : MonoBehaviour
 
         if (newHealth <= 0)
         {
-            Debug.Log("Player died!");
+            Die();
         }
     }
 
@@ -171,5 +173,36 @@ public class Player : MonoBehaviour
         Vector3 scale = transform.localScale;
         scale.x = facingRight ? Mathf.Abs(scale.x) : -Mathf.Abs(scale.x);
         transform.localScale = scale;
+    }
+
+    private void Die()
+    {
+        if (isDead)
+            return;
+
+        isDead = true;
+
+        Debug.Log("Player died!");
+
+        SpawnDeathPanel();
+
+        Destroy(gameObject);
+    }
+
+    private void SpawnDeathPanel()
+    {
+        if (deathPanelPrefab == null)
+        {
+            Debug.LogWarning("Player: Death panel prefab is not assigned.", this);
+            return;
+        }
+
+        if (G.ui == null)
+        {
+            Debug.LogWarning("Player: G.ui is null, cannot spawn death panel.", this);
+            return;
+        }
+
+        Instantiate(deathPanelPrefab, G.ui.transform);
     }
 }
