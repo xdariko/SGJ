@@ -16,12 +16,15 @@ public class HookAbility : BaseAbility
     private HookProjectile activeHook;
     private bool isHookActive = false;
     private float enhancedWindowEndTime = 0f;
+    private Player currentOwnerPlayer;
 
-    public bool IsEnhancedAttackAvailable => Time.time < enhancedWindowEndTime;
+    public bool IsEnhancedAttackAvailable => enhancedWindowEndTime > 0f && Time.time < enhancedWindowEndTime;
 
     protected override void UseAbility(Player player)
     {
         if (player == null || hookPrefab == null) return;
+
+        currentOwnerPlayer = player;
 
         if (isHookActive)
         {
@@ -34,9 +37,9 @@ public class HookAbility : BaseAbility
 
         // Get hook direction from mouse position
         PlayerController playerController = player.GetComponent<PlayerController>();
-        Vector2 hookDirection = playerController != null ?
-            playerController.GetMouseDirection() :
-            (player.IsFacingRight ? Vector2.right : Vector2.left);
+        Vector2 hookDirection = playerController != null
+            ? playerController.GetMouseDirection()
+            : (player.IsFacingRight ? Vector2.right : Vector2.left);
 
         // Instantiate hook
         GameObject hookObject = Instantiate(hookPrefab, player.transform.position, Quaternion.identity);
@@ -66,21 +69,20 @@ public class HookAbility : BaseAbility
     {
         if (hook != activeHook) return;
 
-        // Get player
         Player player = activeHook.Owner.GetComponent<Player>();
         if (player == null) return;
 
-        // Teleport player to hook position (near enemy)
+        // Сохраняем позицию игрока ДО телепорта
+        float playerXBeforeTeleport = player.transform.position.x;
+        float hookX = hook.transform.position.x;
+
+        // Телепортируем игрока к точке попадания хука
         player.transform.position = hook.transform.position;
 
-        // Face player towards enemy
-        if (hook.transform.position.x > player.transform.position.x)
+        // Разворачиваем только на основе старой позиции игрока
+        if (Mathf.Abs(hookX - playerXBeforeTeleport) > 0.01f)
         {
-            player.SetFacingRight(true);
-        }
-        else
-        {
-            player.SetFacingRight(false);
+            player.SetFacingRight(hookX > playerXBeforeTeleport);
         }
 
         // Activate enhanced attack window
@@ -112,13 +114,14 @@ public class HookAbility : BaseAbility
     {
         base.UpdateCooldown(deltaTime);
 
-        // Check if enhanced window has ended
-        if (IsEnhancedAttackAvailable && Time.time >= enhancedWindowEndTime)
+        // Если окно усиленной атаки закончилось — выключаем его
+        if (enhancedWindowEndTime > 0f && Time.time >= enhancedWindowEndTime)
         {
-            Player player = activeHook != null ? activeHook.Owner.GetComponent<Player>() : null;
-            if (player != null)
+            enhancedWindowEndTime = 0f;
+
+            if (currentOwnerPlayer != null)
             {
-                player.InvokeOnEnhancedAttackAvailable(false);
+                currentOwnerPlayer.InvokeOnEnhancedAttackAvailable(false);
             }
         }
     }

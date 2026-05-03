@@ -9,6 +9,16 @@ public class PlayerCombat : MonoBehaviour
     [SerializeField] private BaseAbility hookAbility;
     [SerializeField] private BaseAbility areaAttackAbility;
 
+    [Header("Animation Settings")]
+    [SerializeField] private Animator animator;
+    [SerializeField] private string meleeAttackTriggerName = "Attack";
+    [SerializeField] private string rangedAttackTriggerName = "Shoot";
+    [SerializeField] private string hookTriggerName = "Hook";
+    [SerializeField] private string areaAttackTriggerName = "AreaAttack";
+
+    [Header("Animator Controllers")]
+    [SerializeField] private RuntimeAnimatorController[] mutationAnimators;
+
     [Header("Input Settings")]
     [SerializeField] private Key switchAbilityKey = Key.E;
 
@@ -16,11 +26,12 @@ public class PlayerCombat : MonoBehaviour
     private PlayerController playerController;
     private BaseAbility currentPrimaryAbility;
     private bool isUsingEnhancedAttack = false;
+    private int currentMutationStage = 0;
 
     public BaseAbility CurrentPrimaryAbility => currentPrimaryAbility;
     public bool IsUsingEnhancedAttack => isUsingEnhancedAttack;
+    public int CurrentMutationStage => currentMutationStage;
 
-    // Public methods for setting abilities (used by PlayerExampleSetup)
     public void SetMeleeAbility(BaseAbility ability) { meleeAbility = ability; }
     public void SetRangedAbility(BaseAbility ability) { rangedAbility = ability; }
     public void SetHookAbility(BaseAbility ability) { hookAbility = ability; }
@@ -29,7 +40,6 @@ public class PlayerCombat : MonoBehaviour
     private void Awake()
     {
         Debug.Log("PlayerCombat.Awake() called");
-        // Не получаем компоненты здесь, чтобы избежать проблем с порядком Awake
     }
 
     private void Start()
@@ -37,7 +47,10 @@ public class PlayerCombat : MonoBehaviour
         player = GetComponent<Player>();
         playerController = GetComponent<PlayerController>();
 
-        Debug.Log($"PlayerCombat.Start(): player = {player != null}, playerController = {playerController != null}");
+        if (animator == null)
+            animator = GetComponent<Animator>();
+
+        Debug.Log($"PlayerCombat.Start(): player = {player != null}, playerController = {playerController != null}, animator = {animator != null}");
         Debug.Log($"PlayerCombat.Start(): Mouse.current = {Mouse.current != null}, Keyboard.current = {Keyboard.current != null}");
 
         if (player != null)
@@ -95,7 +108,6 @@ public class PlayerCombat : MonoBehaviour
 
     private void HandleAbilityInput()
     {
-        // Debug mouse state
         if (Mouse.current == null)
         {
             Debug.LogWarning("PlayerCombat: Mouse.current is null!");
@@ -111,14 +123,14 @@ public class PlayerCombat : MonoBehaviour
             TryUsePrimaryAbility();
         }
 
-        // Secondary attack (Right Mouse Button)
+        // Secondary attack (Right Mouse Button) — Hook
         if (Mouse.current.rightButton.wasPressedThisFrame)
         {
             Debug.Log("RIGHT MOUSE BUTTON PRESSED - Trying secondary ability");
             TryUseSecondaryAbility();
         }
 
-        // Tertiary attack (Space)
+        // Tertiary attack (Space) — Area Attack
         if (Keyboard.current != null && Keyboard.current.spaceKey.wasPressedThisFrame)
         {
             Debug.Log("SPACE PRESSED - Trying tertiary ability");
@@ -149,7 +161,22 @@ public class PlayerCombat : MonoBehaviour
             return;
         }
 
+        if (!currentPrimaryAbility.IsUnlocked)
+        {
+            Debug.LogWarning("PlayerCombat: currentPrimaryAbility is locked!");
+            return;
+        }
+
+        if (!currentPrimaryAbility.CanUse)
+        {
+            Debug.LogWarning("PlayerCombat: currentPrimaryAbility is on cooldown or unavailable!");
+            return;
+        }
+
         Debug.Log($"PlayerCombat: Trying to use primary ability. Type: {currentPrimaryAbility.GetType().Name}, CanUse: {currentPrimaryAbility.CanUse}");
+
+        // Запускаем соответствующую анимацию атаки
+        PlayAttackAnimation();
 
         // Check if enhanced attack is available and we're using melee
         if (isUsingEnhancedAttack && currentPrimaryAbility is MeleeAbility melee)
@@ -165,19 +192,96 @@ public class PlayerCombat : MonoBehaviour
         }
     }
 
+    private void PlayAttackAnimation()
+    {
+        if (animator == null)
+        {
+            Debug.LogWarning("PlayerCombat: Animator is not assigned!");
+            return;
+        }
+
+        if (currentPrimaryAbility is MeleeAbility)
+        {
+            animator.ResetTrigger(meleeAttackTriggerName);
+            animator.SetTrigger(meleeAttackTriggerName);
+            Debug.Log("Playing MELEE attack animation");
+        }
+        else if (currentPrimaryAbility is RangedAbility)
+        {
+            animator.ResetTrigger(rangedAttackTriggerName);
+            animator.SetTrigger(rangedAttackTriggerName);
+            Debug.Log("Playing RANGED attack animation");
+        }
+    }
+
     private void TryUseSecondaryAbility()
     {
-        hookAbility?.TryUseAbility(player);
+        if (hookAbility == null)
+        {
+            Debug.LogWarning("PlayerCombat: hookAbility is null!");
+            return;
+        }
+
+        if (!hookAbility.IsUnlocked || !hookAbility.CanUse)
+        {
+            Debug.LogWarning("PlayerCombat: hookAbility is locked or on cooldown!");
+            return;
+        }
+
+        // Запускаем анимацию хука
+        PlayHookAnimation();
+
+        hookAbility.TryUseAbility(player);
+    }
+
+    private void PlayHookAnimation()
+    {
+        if (animator == null)
+        {
+            Debug.LogWarning("PlayerCombat: Animator is not assigned!");
+            return;
+        }
+
+        animator.ResetTrigger(hookTriggerName);
+        animator.SetTrigger(hookTriggerName);
+        Debug.Log("Playing HOOK animation");
     }
 
     private void TryUseTertiaryAbility()
     {
-        areaAttackAbility?.TryUseAbility(player);
+        if (areaAttackAbility == null)
+        {
+            Debug.LogWarning("PlayerCombat: areaAttackAbility is null!");
+            return;
+        }
+
+        if (!areaAttackAbility.IsUnlocked || !areaAttackAbility.CanUse)
+        {
+            Debug.LogWarning("PlayerCombat: areaAttackAbility is locked or on cooldown!");
+            return;
+        }
+
+        // Запускаем анимацию area-атаки
+        PlayAreaAttackAnimation();
+
+        areaAttackAbility.TryUseAbility(player);
+    }
+
+    private void PlayAreaAttackAnimation()
+    {
+        if (animator == null)
+        {
+            Debug.LogWarning("PlayerCombat: Animator is not assigned!");
+            return;
+        }
+
+        animator.ResetTrigger(areaAttackTriggerName);
+        animator.SetTrigger(areaAttackTriggerName);
+        Debug.Log("Playing AREA ATTACK animation");
     }
 
     private void SwitchPrimaryAbility()
     {
-        // Only switch between melee and ranged if both are unlocked
         if (meleeAbility == null || rangedAbility == null)
         {
             Debug.LogWarning("Cannot switch: melee or ranged ability not assigned!");
@@ -190,7 +294,6 @@ public class PlayerCombat : MonoBehaviour
             return;
         }
 
-        // Toggle between melee and ranged
         if (currentPrimaryAbility == meleeAbility)
         {
             currentPrimaryAbility = rangedAbility;
@@ -203,13 +306,56 @@ public class PlayerCombat : MonoBehaviour
         }
         else
         {
-            // Default to melee if current is something else
             currentPrimaryAbility = meleeAbility;
             Debug.Log("Switched to melee ability (default)");
         }
 
         Debug.Log($"Current primary ability is now: {currentPrimaryAbility.name}");
     }
+
+    // ============================================================
+    // СИСТЕМА МУТАЦИЙ — смена аниматора
+    // ============================================================
+
+    public void MutateToNextStage()
+    {
+        int nextStage = currentMutationStage + 1;
+
+        if (mutationAnimators == null || nextStage >= mutationAnimators.Length)
+        {
+            Debug.LogWarning($"PlayerCombat: No animator for mutation stage {nextStage}! Max stage: {(mutationAnimators != null ? mutationAnimators.Length - 1 : 0)}");
+            return;
+        }
+
+        SetMutationStage(nextStage);
+    }
+
+    public void SetMutationStage(int stage)
+    {
+        if (mutationAnimators == null || stage < 0 || stage >= mutationAnimators.Length)
+        {
+            Debug.LogWarning($"PlayerCombat: Invalid mutation stage {stage}!");
+            return;
+        }
+
+        if (mutationAnimators[stage] == null)
+        {
+            Debug.LogWarning($"PlayerCombat: Animator for stage {stage} is not assigned!");
+            return;
+        }
+
+        currentMutationStage = stage;
+        animator.runtimeAnimatorController = mutationAnimators[stage];
+
+        Debug.Log($"PlayerCombat: Mutated to stage {stage}. Animator changed to: {mutationAnimators[stage].name}");
+    }
+
+    public void ResetMutation()
+    {
+        SetMutationStage(0);
+    }
+
+    // ============================================================
 
     public void UnlockRangedAbility()
     {
@@ -244,7 +390,6 @@ public class PlayerCombat : MonoBehaviour
         Debug.Log($"Enhanced attack available: {available}");
     }
 
-    // Visualization for ability cooldowns
     private void OnDrawGizmosSelected()
     {
         if (meleeAbility != null && !meleeAbility.CanUse)

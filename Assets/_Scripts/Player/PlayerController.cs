@@ -6,25 +6,28 @@ public class PlayerController : MonoBehaviour
     public static PlayerController Instance { get; private set; }
 
     [SerializeField] private PlayerDetailsSO playerDetails;
+    [SerializeField] private Animator animator;
 
     private Rigidbody2D rb;
+    private Player player;
+
     private Vector2 moveDirection;
     private Vector2 lastNonZeroDirection = Vector2.down;
 
     private bool isSprinting = false;
     private bool isDashing = false;
     private bool canDash = true;
+
     private float dashTimer;
     private float dashCooldownTimer;
 
     public event System.Action<Vector2> OnMove;
     public Vector2 LastMoveDirection => lastNonZeroDirection;
 
-    private Player player;
-
     private void Awake()
     {
         Debug.Log("PlayerController.Awake() called");
+
         if (Instance != null && Instance != this)
         {
             Debug.LogWarning("PlayerController: Duplicate instance detected, destroying this one");
@@ -37,13 +40,17 @@ public class PlayerController : MonoBehaviour
         rb = GetComponent<Rigidbody2D>();
         player = GetComponent<Player>();
 
-        Debug.Log($"PlayerController initialized. Rigidbody: {rb != null}, Player: {player != null}");
+        if (animator == null)
+            animator = GetComponent<Animator>();
+
+        Debug.Log($"PlayerController initialized. Rigidbody: {rb != null}, Player: {player != null}, Animator: {animator != null}");
     }
 
     private void Update()
     {
         ProcessInputs();
         HandleTimers();
+        UpdateAnimations();
     }
 
     private void FixedUpdate()
@@ -110,9 +117,8 @@ public class PlayerController : MonoBehaviour
     private void Move()
     {
         float currentSpeed = playerDetails.MoveSpeed *
-            (isSprinting ? playerDetails.SprintMultiplier : 1f);
+                             (isSprinting ? playerDetails.SprintMultiplier : 1f);
 
-        // Only move if there's input, otherwise stop
         if (moveDirection.magnitude > 0.1f)
         {
             rb.linearVelocity = moveDirection * currentSpeed;
@@ -124,6 +130,18 @@ public class PlayerController : MonoBehaviour
         }
 
         OnMove?.Invoke(moveDirection != Vector2.zero ? moveDirection : lastNonZeroDirection);
+    }
+
+    private void UpdateAnimations()
+    {
+        if (animator == null)
+            return;
+
+        bool isMoving = moveDirection.sqrMagnitude > 0.01f || isDashing;
+        animator.SetBool("IsMoving", isMoving);
+
+        // Если хочешь, чтобы при спринте анимация игралась быстрее:
+        animator.speed = (isMoving && isSprinting) ? playerDetails.SprintMultiplier : 1f;
     }
 
     private void HandleTimers()
@@ -200,7 +218,7 @@ public class PlayerController : MonoBehaviour
         Vector2 mousePosition = Mouse.current.position.ReadValue();
         Vector3 worldMousePos = Camera.main.ScreenToWorldPoint(mousePosition);
         Vector2 direction = ((Vector2)worldMousePos - (Vector2)transform.position).normalized;
-        
+
         Debug.Log($"Mouse direction: {direction}");
         return direction;
     }
