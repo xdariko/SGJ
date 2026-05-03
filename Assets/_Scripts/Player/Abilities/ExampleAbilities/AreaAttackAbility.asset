@@ -17,13 +17,13 @@ MonoBehaviour:
   icon: {fileID: 0}
   cooldown: 1
   activationSound: {fileID: 0}
-  isUnlocked: 0
-  visualEffectPrefab: {fileID: 0}
+  isUnlocked: 1
+  visualEffectPrefab: {fileID: 7346908314540513663, guid: 3138de8eebcf8e24c911bf99a44edd95, type: 3}
   effectDuration: 1
   attackRadius: 3
   attackDamage: 15
   enemyLayer:
     serializedVersion: 2
     m_Bits: 0
-  areaIndicatorPrefab: {fileID: 0}
-  indicatorDuration: 0.5
+  effectScaleMultiplier: 2
+  screenShakeForce: 0.6

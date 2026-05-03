@@ -7,40 +7,47 @@ public class AreaAttackAbility : BaseAbility
     [SerializeField] private float attackRadius = 3f;
     [SerializeField] private float attackDamage = 15f;
     [SerializeField] private LayerMask enemyLayer;
-    [SerializeField] private GameObject areaIndicatorPrefab;
-    [SerializeField] private float indicatorDuration = 0.5f;
+
+    [Header("Effect")]
+    [SerializeField] private float effectScaleMultiplier = 2f;
 
     [Header("Camera Shake")]
     [SerializeField] private float screenShakeForce = 0.6f;
 
     protected override void UseAbility(Player player)
     {
-        if (player == null) return;
+        if (player == null)
+            return;
 
-        PlayActivationSound(player.transform.position);
+        Vector3 attackPosition = player.transform.position;
 
-        // Show area indicator
-        if (areaIndicatorPrefab != null)
-        {
-            GameObject indicator = Instantiate(areaIndicatorPrefab, player.transform.position, Quaternion.identity);
-            indicator.transform.localScale = new Vector3(attackRadius * 2, attackRadius * 2, 1f);
-            Destroy(indicator, indicatorDuration);
-        }
+        PlayActivationSound(attackPosition);
 
-        // Perform area attack
-        PerformAreaAttack(player.transform.position);
+        SpawnAreaAttackEffect(attackPosition);
 
-        InstantiateVisualEffect(player.transform.position, Quaternion.identity);
+        PerformAreaAttack(attackPosition);
+
         G.screenShake?.Shake(screenShakeForce);
+
         Debug.Log($"Area attack with radius {attackRadius}!");
         InvokeOnAbilityUsed();
+    }
+
+    private void SpawnAreaAttackEffect(Vector3 position)
+    {
+        GameObject effect = InstantiateVisualEffect(position, Quaternion.identity);
+
+        if (effect == null)
+            return;
+
+        effect.transform.localScale = Vector3.one * attackRadius * effectScaleMultiplier;
     }
 
     private void PerformAreaAttack(Vector2 center)
     {
         Collider2D[] hitEnemies = Physics2D.OverlapCircleAll(center, attackRadius, enemyLayer);
 
-        foreach (var enemyCollider in hitEnemies)
+        foreach (Collider2D enemyCollider in hitEnemies)
         {
             IDamageable damageable = enemyCollider.GetComponent<IDamageable>();
 
@@ -52,8 +59,7 @@ public class AreaAttackAbility : BaseAbility
         }
     }
 
-    // Visualization helper for editor
-    public void OnDrawGizmosSelected()
+    private void OnDrawGizmosSelected()
     {
         Gizmos.color = Color.red;
         Gizmos.DrawWireSphere(Vector3.zero, attackRadius);
