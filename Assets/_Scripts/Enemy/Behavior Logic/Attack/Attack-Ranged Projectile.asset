@@ -19,5 +19,5 @@ MonoBehaviour:
   _projectileSpeed: 6
   _projectileLifetime: 4
   _attackCooldown: 1.5
-  _attackWindup: 0.15
+  _projectileSpawnDelayAfterAnimation: 0.7
   _stopWhileAttacking: 1

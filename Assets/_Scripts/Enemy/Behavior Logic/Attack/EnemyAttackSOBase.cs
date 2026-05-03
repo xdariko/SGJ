@@ -25,6 +25,5 @@ public class EnemyAttackSOBase : ScriptableObject
     public virtual void DoFrameUpdateLogic() { }
 
     public virtual void DoPhysicsLogic() { }
-    public virtual void DoAnimationTriggerEventLogic(Enemy.AnimationTriggerType triggerType) { }
     public virtual void ResetValues() { }
 }

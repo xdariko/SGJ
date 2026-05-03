@@ -1,5 +1,6 @@
 using System.Collections;
 using UnityEngine;
+using UnityEngine.Serialization;
 using UnityEngine.AI;
 
 [CreateAssetMenu(fileName = "Attack-Ranged Projectile", menuName = "Enemy Logic/Attack Logic/Ranged Projectile")]
@@ -14,7 +15,12 @@ public class EnemyAttackRangedProjectile : EnemyAttackSOBase
 
     [Header("Attack Timing")]
     [SerializeField] private float _attackCooldown = 1.5f;
-    [SerializeField] private float _attackWindup = 0.15f;
+
+    [Tooltip("Used only if the Animator cannot report the real Attack clip length.")]
+    [FormerlySerializedAs("_attackWindup")]
+    [FormerlySerializedAs("_attackAnimationFallbackDuration")]
+    [SerializeField] private float _projectileSpawnDelayAfterAnimation = 0.6f;
+
     [SerializeField] private bool _stopWhileAttacking = true;
 
     private EnemyNavMeshAgent2D _navMeshAgent2D;
@@ -68,14 +74,32 @@ public class EnemyAttackRangedProjectile : EnemyAttackSOBase
             StopEnemyCompletely();
             FacePlayer();
 
-            yield return new WaitForSeconds(_attackWindup);
+            yield return PlayAttackAnimationBeforeProjectile();
 
-            ShootProjectile();
+            // Projectile is spawned only after the attack animation has finished.
+            if (enemy.IsAggroed)
+                ShootProjectile();
+
+            // Do not keep Animator in Attack during cooldown.
+            enemy.EnemyAnimator?.PlayState(EnemyAnimState.Idle);
 
             yield return new WaitForSeconds(_attackCooldown);
         }
 
         enemy.StateMachine.ChangeState(enemy.IdleState);
+    }
+
+
+    private IEnumerator PlayAttackAnimationBeforeProjectile()
+    {
+        if (enemy.EnemyAnimator == null)
+        {
+            yield return new WaitForSeconds(_projectileSpawnDelayAfterAnimation);
+            yield break;
+        }
+
+        enemy.EnemyAnimator.PlayAttack();
+        yield return enemy.EnemyAnimator.WaitForAttackAnimation(_projectileSpawnDelayAfterAnimation);
     }
 
     private void ShootProjectile()

@@ -7,7 +7,7 @@ using UnityEngine.AI;
 public class EnemyChaseDirectToPlayer : EnemyChaseSOBase
 {
     [SerializeField] private float _movementSpeed = 1.75f;
-    [SerializeField] private float _stoppingDistance = 0.9f;
+    [SerializeField] private float _stoppingDistance = 0.1f;
     [SerializeField] private float _destinationRefreshRate = 0.1f;
 
     private EnemyNavMeshAgent2D _navMeshAgent2D;

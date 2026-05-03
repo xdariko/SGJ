@@ -13,16 +13,16 @@ MonoBehaviour:
   m_Name: Attack-Explode Cloud
   m_EditorClassIdentifier: Assembly-CSharp::EnemyAttackExplodeCloud
   screamerSound: {fileID: 0}
-  _windup: 0.35
+  _attackAnimationFallbackDuration: 0.3
   _explosionDamage: 20
   _explosionRadius: 1.2
   _playerLayer:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 8
   _cloudPrefab: {fileID: 2374319126685617702, guid: 5e6c7fbac0ae4de4699f37848a10ae53, type: 3}
   _cloudDamagePerTick: 5
   _cloudTickRate: 0.5
   _cloudDuration: 3
-  _cloudScale: 1.5
+  _cloudScale: 3
   _destroyEnemyAfterExplosion: 1
   _destroyDelay: 0.05

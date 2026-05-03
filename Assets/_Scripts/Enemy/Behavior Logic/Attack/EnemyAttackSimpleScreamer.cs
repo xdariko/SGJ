@@ -13,10 +13,6 @@ public class EnemyAttackSimpleScreamer : EnemyAttackSOBase
 
     private bool _hasAttacked = false;
 
-    public override void DoAnimationTriggerEventLogic(Enemy.AnimationTriggerType triggerType)
-    {
-        base.DoAnimationTriggerEventLogic(triggerType);
-    }
 
     public override void DoEnterLogic()
     {

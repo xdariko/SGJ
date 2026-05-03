@@ -6,15 +6,11 @@ public class EnemyChaseState : EnemyState
 {
     public EnemyChaseState(Enemy enemy, EnemyStateMachine enemyStateMachine) : base(enemy, enemyStateMachine) { }
 
-    public override void AnimationTriggerEvent(Enemy.AnimationTriggerType triggerType)
-    {
-        base.AnimationTriggerEvent(triggerType);
-        enemy.EnemyChaseBaseInstance.DoAnimationTriggerEventLogic(triggerType);
-    }
 
     public override void EnterState()
     {
         base.EnterState();
+        enemy.EnemyAnimator?.PlayState(EnemyAnimState.Chase);
         enemy.EnemyChaseBaseInstance.DoEnterLogic();
     }
 

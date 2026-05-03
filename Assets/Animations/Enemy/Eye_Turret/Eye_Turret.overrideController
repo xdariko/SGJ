@@ -1,0 +1,21 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!221 &22100000
+AnimatorOverrideController:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: Eye_Turret
+  m_Controller: {fileID: 9100000, guid: 159b7ad22583f8442a5acfaaaf7e0061, type: 2}
+  m_Clips:
+  - m_OriginalClip: {fileID: 7400000, guid: 7135f278b3cb3924cb95ee8f7cbbfe32, type: 2}
+    m_OverrideClip: {fileID: 7400000, guid: 56ab16f507df2c24880e23f36301b5ec, type: 2}
+  - m_OriginalClip: {fileID: 7400000, guid: fe08e6280883af84085df2dae2d96c1f, type: 2}
+    m_OverrideClip: {fileID: 7400000, guid: 2ca5f5921a73be14f90f59b673bd812d, type: 2}
+  - m_OriginalClip: {fileID: 7400000, guid: 28c470894d873c34196746a3e50262b9, type: 2}
+    m_OverrideClip: {fileID: 7400000, guid: 30f2a5ab178eb09479241eaf56864949, type: 2}
+  - m_OriginalClip: {fileID: 7400000, guid: ae2f49228bbaf514e9433fb8e74e85c0, type: 2}
+    m_OverrideClip: {fileID: 7400000, guid: a52472987f55fe74b9b842815d70e65f, type: 2}
+  - m_OriginalClip: {fileID: 7400000, guid: 94b55d9b7df2af646a2c6dddad491c3f, type: 2}
+    m_OverrideClip: {fileID: 7400000, guid: c9916ad9e79f9cc49beb88f2581da3a1, type: 2}

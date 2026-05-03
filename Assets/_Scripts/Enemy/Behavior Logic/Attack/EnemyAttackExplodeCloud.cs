@@ -1,12 +1,14 @@
 using System.Collections;
 using UnityEngine;
+using UnityEngine.Serialization;
 using UnityEngine.AI;
 
 [CreateAssetMenu(fileName = "Attack-Explode Cloud", menuName = "Enemy Logic/Attack Logic/Explode Cloud")]
 public class EnemyAttackExplodeCloud : EnemyAttackSOBase
 {
     [Header("Explosion")]
-    [SerializeField] private float _windup = 0.35f;
+    [FormerlySerializedAs("_windup")]
+    [SerializeField] private float _attackAnimationFallbackDuration = 0.35f;
     [SerializeField] private float _explosionDamage = 20f;
     [SerializeField] private float _explosionRadius = 1.2f;
     [SerializeField] private LayerMask _playerLayer;
@@ -62,7 +64,11 @@ public class EnemyAttackExplodeCloud : EnemyAttackSOBase
 
     private IEnumerator ExplodeRoutine()
     {
-        yield return new WaitForSeconds(_windup);
+        if (enemy.EnemyAnimator != null)
+            yield return enemy.EnemyAnimator.PlayAttackAndWait(_attackAnimationFallbackDuration);
+        else
+            yield return new WaitForSeconds(_attackAnimationFallbackDuration);
+
         Explode();
     }
 

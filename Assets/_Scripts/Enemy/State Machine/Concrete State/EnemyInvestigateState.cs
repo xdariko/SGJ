@@ -4,15 +4,11 @@ public class EnemyInvestigateState : EnemyState
 {
     public EnemyInvestigateState(Enemy enemy, EnemyStateMachine enemyStateMachine) : base(enemy, enemyStateMachine) { }
 
-    public override void AnimationTriggerEvent(Enemy.AnimationTriggerType triggerType)
-    {
-        base.AnimationTriggerEvent(triggerType);
-        enemy.EnemyInvestigateBaseInstance.DoAnimationTriggerEventLogic(triggerType);
-    }
 
     public override void EnterState()
     {
         base.EnterState();
+        enemy.EnemyAnimator?.PlayState(EnemyAnimState.Alert);
         enemy.EnemyInvestigateBaseInstance.DoEnterLogic();
     }
 

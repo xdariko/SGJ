@@ -83,6 +83,7 @@ public class Player : MonoBehaviour
     private void Update()
     {
         RegenerateStamina();
+        RegenerateHealth();
     }
 
     private void OnEnable()
@@ -128,6 +129,32 @@ public class Player : MonoBehaviour
 
         staminaEvent.CallStaminaChanged(currentStamina, playerDetails.maxStamina, delta);
         return true;
+    }
+    private void RegenerateHealth()
+    {
+        if (currentHealth <= 0f) return;
+        if (currentHealth >= playerDetails.maxHealth) return;
+
+        RestoreHealth(playerDetails.healthRegenRate * Time.deltaTime);
+    }
+
+    public void RestoreHealth(float amount)
+    {
+        if (amount <= 0f)
+            return;
+
+        if (currentHealth <= 0f)
+            return;
+
+        float oldHealth = currentHealth;
+        currentHealth = Mathf.Min(playerDetails.maxHealth, currentHealth + amount);
+
+        float delta = currentHealth - oldHealth;
+
+        if (delta <= 0f)
+            return;
+
+        healthEvent.CallHealthChanged(currentHealth, playerDetails.maxHealth, delta);
     }
 
     public void SetInvincible(bool invincible)

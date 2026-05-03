@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -87,7 +88,18 @@ public class EnemyHealth : MonoBehaviour, IDamageable
 
         Enemy enemy = GetComponent<Enemy>();
         if (enemy != null)
+        {
+            enemy.StopAllCoroutines();
             enemy.MoveEnemy(Vector2.zero);
+            enemy.enabled = false;
+        }
+
+        EnemyAnimator enemyAnimator = enemy != null && enemy.EnemyAnimator != null
+            ? enemy.EnemyAnimator
+            : GetComponentInChildren<EnemyAnimator>();
+
+        if (enemyAnimator != null)
+            enemyAnimator.PlayDeath();
 
         NavMeshAgent agent = GetComponent<NavMeshAgent>();
         if (agent != null && agent.enabled && agent.isOnNavMesh)
@@ -103,6 +115,16 @@ public class EnemyHealth : MonoBehaviour, IDamageable
         OnDeath?.Invoke();
 
         if (_destroyOnDeath)
-            Destroy(gameObject, _destroyDelay);
+            StartCoroutine(DeathRoutine(enemyAnimator));
+    }
+
+    private IEnumerator DeathRoutine(EnemyAnimator enemyAnimator)
+    {
+        if (enemyAnimator != null)
+            yield return enemyAnimator.PlayDeathAndWait(_destroyDelay);
+        else
+            yield return new WaitForSeconds(_destroyDelay);
+
+        Destroy(gameObject);
     }
 }

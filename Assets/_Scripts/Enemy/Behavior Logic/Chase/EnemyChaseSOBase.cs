@@ -35,6 +35,5 @@ public class EnemyChaseSOBase : ScriptableObject
     }
 
     public virtual void DoPhysicsLogic() { }
-    public virtual void DoAnimationTriggerEventLogic(Enemy.AnimationTriggerType triggerType) { }
     public virtual void ResetValues() { }
 }

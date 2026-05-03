@@ -15,9 +15,19 @@ public class Enemy : MonoBehaviour, IEnemyMoveable, ITriggerCheckable
     public Transform PlayerTarget { get; private set; }
     public Vector3 InvestigationTargetPosition { get; set; }
     public float InvestigationDuration { get; set; } = 3f;
+    public EnemyAnimator EnemyAnimator { get; private set; }
+
+    private EnemyHealth _health;
 
     protected virtual void Awake()
     {
+        EnemyAnimator = GetComponentInChildren<EnemyAnimator>();
+
+        if (EnemyAnimator == null)
+            EnemyAnimator = gameObject.AddComponent<EnemyAnimator>();
+
+        _health = GetComponent<EnemyHealth>();
+
         EnemyIdleBaseInstance = Instantiate(EnemyIdleBase);
         EnemyChaseBaseInstance = Instantiate(EnemyChaseBase);
         EnemyInvestigateBaseInstance = Instantiate(EnemyInvestigateBase);
@@ -29,15 +39,14 @@ public class Enemy : MonoBehaviour, IEnemyMoveable, ITriggerCheckable
         ChaseState = new EnemyChaseState(this, StateMachine);
         AttackState = new EnemyAttackState(this, StateMachine);
         InvestigateState = new EnemyInvestigateState(this, StateMachine);
-        // Ensure enemy has a body collider for hit detection
+
         if (GetComponent<Collider2D>() == null)
         {
             CircleCollider2D col = gameObject.AddComponent<CircleCollider2D>();
+            col.isTrigger = true;
+
             NavMeshAgent agent = GetComponent<NavMeshAgent>();
-            if (agent != null)
-                col.radius = agent.radius;
-            else
-                col.radius = 0.5f;
+            col.radius = agent != null ? agent.radius : 0.5f;
         }
     }
 
@@ -55,20 +64,19 @@ public class Enemy : MonoBehaviour, IEnemyMoveable, ITriggerCheckable
 
     protected virtual void Update()
     {
-        // Keep PlayerTarget up to date (find if null or destroyed)
-        if (PlayerTarget == null)
-        {
-            GameObject playerObj = GameObject.FindGameObjectWithTag("Player");
-            if (playerObj != null)
-                PlayerTarget = playerObj.transform;
-        }
+        if (_health != null && _health.IsDead)
+            return;
 
-        StateMachine.CurrentEnemyState?.FrameUpdate();
+        StateMachine.CurrentEnemyState.FrameUpdate();
     }
 
     protected virtual void FixedUpdate()
     {
-        StateMachine.CurrentEnemyState?.PhysicsUpdate();
+        if (_health != null && _health.IsDead)
+            return;
+
+        StateMachine.CurrentEnemyState.PhysicsUpdate();
+
     }
 
     #region SO Variables
@@ -147,17 +155,4 @@ public class Enemy : MonoBehaviour, IEnemyMoveable, ITriggerCheckable
 
     #endregion
 
-    #region Animation Triggers
-    public void TriggerAnimationEvent(AnimationTriggerType triggerType)
-    {
-        StateMachine.CurrentEnemyState.AnimationTriggerEvent(triggerType);
-    }
-
-    public enum AnimationTriggerType
-    {
-        EnemyDamaged,
-        PlayFootstepSound
-    }
-
-    #endregion
 }
