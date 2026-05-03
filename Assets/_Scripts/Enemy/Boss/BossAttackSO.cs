@@ -142,27 +142,42 @@ public class BossAttackSO : EnemyAttackSOBase
 
         yield return new WaitForSeconds(p.windup);
 
-        Collider2D[] hit = Physics2D.OverlapCircleAll((Vector2)_boss.transform.position, p.radius);
-        Debug.LogError($"[BossAttackSO] MeleeSlam: radius={p.radius}, bossPos={_boss.transform.position}, hitsFound={hit.Length}");
-        foreach (Collider2D col in hit)
+        // Find all colliders in radius, then filter manually
+        Collider2D[] allHit = Physics2D.OverlapCircleAll((Vector2)_boss.transform.position, p.radius);
+        Debug.LogWarning($"[BossAttackSO] MeleeSlam: radius={p.radius}, bossPos={_boss.transform.position}, allHits={allHit.Length}");
+        
+        int dealtDamageCount = 0;
+        foreach (Collider2D col in allHit)
         {
-            Debug.LogError($"[BossAttackSO] MeleeSlam hit: {col.gameObject.name}, tag={col.tag}, hasIDamageable={col.GetComponent<IDamageable>() != null}");
-            if (col.CompareTag("Player"))
+            // Skip triggers (AggroRadius, StrikingDistance)
+            if (col.isTrigger)
             {
-                IDamageable d = col.GetComponent<IDamageable>();
-                if (d != null)
-                {
-                    Debug.LogError($"[BossAttackSO] >>> DEALING {p.damage} DAMAGE to {col.gameObject.name} via IDamageable");
-                    d.TakeDamage(p.damage);
-                }
-                else
-                {
-                    Debug.LogWarning($"[BossAttackSO] Player {col.gameObject.name} has no IDamageable, trying SendMessage");
-                    col.SendMessage("TakeDamage", p.damage, SendMessageOptions.DontRequireReceiver);
-                }
+                Debug.LogWarning($"[BossAttackSO] MeleeSlam skipped trigger: {col.gameObject.name}");
+                continue;
+            }
+            
+            // Skip the boss itself and its children
+            if (col.transform.root == _boss.transform.root)
+            {
+                Debug.LogWarning($"[BossAttackSO] MeleeSlam skipped self/child: {col.gameObject.name}");
+                continue;
+            }
+            
+            // Only damage objects with IDamageable interface
+            IDamageable damageable = col.GetComponent<IDamageable>();
+            if (damageable != null)
+            {
+                Debug.LogWarning($"[BossAttackSO] >>> DEALING {p.damage} DAMAGE to {col.gameObject.name} (tag={col.tag})");
+                damageable.TakeDamage(p.damage);
+                dealtDamageCount++;
+            }
+            else
+            {
+                Debug.LogWarning($"[BossAttackSO] MeleeSlam: {col.gameObject.name} has no IDamageable (tag={col.tag})");
             }
         }
-
+        
+        Debug.LogWarning($"[BossAttackSO] MeleeSlam complete: totalHits={allHit.Length}, dealtDamageTo={dealtDamageCount}");
         yield return new WaitForSeconds(p.attackDuration);
     }
 
@@ -249,9 +264,12 @@ public class BossAttackSO : EnemyAttackSOBase
 
         Vector2 dir = ((Vector2)_boss.PlayerTarget.position - (Vector2)_boss.transform.position).normalized;
         GameObject proj = Object.Instantiate(p.projectilePrefab, _boss.transform.position, Quaternion.identity);
+        
+        // Set the projectile's owner to this boss so it doesn't damage the boss
         EnemyProjectile ep = proj.GetComponent<EnemyProjectile>();
         if (ep == null) ep = proj.AddComponent<EnemyProjectile>();
         ep.Initialize(dir, p.projectileSpeed, p.damage, p.projectileLifetime, _boss.gameObject);
+        
         Debug.LogWarning($"[BossAttackSO] Ranged fired projectile");
     }
 }
