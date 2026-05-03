@@ -41,7 +41,6 @@ public class EnemyIdleRandomWander : EnemyIdleSOBase
         _agent.updateUpAxis = false;
         _agent.speed = _movementSpeed;
         _agent.stoppingDistance = 0f;
-        _agent.isStopped = false;
 
         if (!_agent.isOnNavMesh)
         {
@@ -56,6 +55,8 @@ public class EnemyIdleRandomWander : EnemyIdleSOBase
                 return;
             }
         }
+
+        _agent.isStopped = false;
 
         SetNewRandomDestination();
     }
